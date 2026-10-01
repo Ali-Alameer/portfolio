@@ -1,0 +1,48 @@
+.figure {
+  margin: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.svg {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.axis {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.bar {
+  fill: var(--box);
+}
+
+.partial {
+  fill: var(--box);
+  fill-opacity: 0.35;
+  stroke: var(--box);
+  stroke-width: 1;
+  stroke-dasharray: 3 2;
+}
+
+.year,
+.value {
+  font-family: var(--font-m);
+  font-size: 10px;
+  text-anchor: middle;
+  fill: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.value {
+  fill: var(--ink);
+  font-weight: 600;
+}
+
+.caption {
+  font: var(--step--1) / 1.4 var(--font-m);
+  color: var(--muted);
+}
