@@ -96,12 +96,7 @@ export default function Home() {
           </p>
           <h1 id="hero-name" className={`${styles.name} ${styles.enter}`} style={step(1)}>
             <span className={styles.honorific}>{profile.honorific}</span> Ali{" "}
-            <span className={styles.detect}>
-              Alameer
-              <span className={styles.box} aria-hidden="true">
-                <span className={styles.boxLabel}>lecturer_in_ai 0.98</span>
-              </span>
-            </span>
+            <span className={styles.surname}>Alameer</span>
           </h1>
 
           <div className={styles.heroGrid}>

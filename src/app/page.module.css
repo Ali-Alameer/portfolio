@@ -388,7 +388,7 @@
   font-weight: 700;
   letter-spacing: -0.045em;
   line-height: 0.95;
-  /* leave room for the detection label above the box */
+  /* space above the name, kept so the hero layout is unchanged */
   padding-top: 0.45em;
 }
 
@@ -397,58 +397,15 @@
   color: var(--muted);
 }
 
-.detect {
-  position: relative;
+.surname {
   display: inline-block;
   margin-left: 0.06em;
   white-space: nowrap;
 }
 
-.box {
-  position: absolute;
-  inset: -0.02em -0.1em -0.1em -0.08em;
-  border: 2px solid var(--box);
-  pointer-events: none;
-  transform-origin: 30% 60%;
-  animation: lock 1.1s cubic-bezier(0.2, 0.7, 0.2, 1) 0.45s both;
-}
-
-/* corner handles, as drawn by annotation tools */
-.box::before,
-.box::after {
-  content: "";
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  background: var(--box);
-}
-
-.box::before {
-  left: -5px;
-  bottom: -5px;
-}
-
-.box::after {
-  right: -5px;
-  bottom: -5px;
-}
-
-.boxLabel {
-  position: absolute;
-  left: -2px;
-  bottom: 100%;
-  font: 500 clamp(0.7rem, 1.4vw, 0.9375rem) / 1 var(--font-m);
-  letter-spacing: 0.02em;
-  color: var(--box-ink);
-  background: var(--box);
-  padding: 0.35em 0.55em;
-  white-space: nowrap;
-  animation: fade 0.4s ease-out 1.1s both;
-}
-
-/* The box starts loose and offset, then settles tightly around the word,
-   like a detector refining its prediction. The resting state is the end
-   state, so a still frame shows the finished box. */
+/* A detection box starts loose and offset, then settles tightly, like a
+   detector refining its prediction (used by the research cards). The
+   resting state is the end state, so a still frame shows the finished box. */
 @keyframes lock {
   0% {
     transform: translate(6%, 10%) scale(1.18, 1.35);
