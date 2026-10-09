@@ -23,9 +23,9 @@ const nf = new Intl.NumberFormat("en-GB");
 
 const nav = [
   { href: "#research", label: "Research" },
-  { href: "#publications", label: "Publications" },
   { href: "#funding", label: "Funding" },
   { href: "#teaching", label: "Teaching" },
+  { href: "#publications", label: "Publications" },
   { href: "#contact", label: "Contact" },
 ];
 
@@ -150,34 +150,6 @@ export default function Home() {
                 </p>
               </article>
             ))}
-          </div>
-        </section>
-
-        {/* Publications ----------------------------------------------- */}
-        <section id="publications" className={styles.section} aria-labelledby="pubs-h">
-          <div className={styles.sectionHead}>
-            <p className={styles.eyebrow}>Publications</p>
-            <h2 id="pubs-h">Papers, 2015 to {Math.max(...publications.map((p) => p.year))}</h2>
-            <p className={styles.intro}>
-              Journal articles, conference papers and my PhD thesis. Citation counts are from Google
-              Scholar ({scholarStats.asOf}). Titles link to a Scholar search for the paper.
-            </p>
-          </div>
-          <Publications />
-
-          <div className={styles.datasets}>
-            <h3>Open datasets</h3>
-            <ul>
-              {datasets.map((d) => (
-                <li key={d.title}>
-                  <span className={styles.dsYear}>{d.year}</span>
-                  <span>
-                    {d.title}
-                    {d.with ? <span className={styles.dsWith}> with {d.with}</span> : null}
-                  </span>
-                </li>
-              ))}
-            </ul>
           </div>
         </section>
 
@@ -307,6 +279,34 @@ export default function Home() {
                 ))}
               </ul>
             </div>
+          </div>
+        </section>
+
+        {/* Publications ----------------------------------------------- */}
+        <section id="publications" className={styles.section} aria-labelledby="pubs-h">
+          <div className={styles.sectionHead}>
+            <p className={styles.eyebrow}>Publications</p>
+            <h2 id="pubs-h">Papers, 2015 to {Math.max(...publications.map((p) => p.year))}</h2>
+            <p className={styles.intro}>
+              Journal articles, conference papers and my PhD thesis. Citation counts are from Google
+              Scholar ({scholarStats.asOf}). Titles link to a Scholar search for the paper.
+            </p>
+          </div>
+          <Publications />
+
+          <div className={styles.datasets}>
+            <h3>Open datasets</h3>
+            <ul>
+              {datasets.map((d) => (
+                <li key={d.title}>
+                  <span className={styles.dsYear}>{d.year}</span>
+                  <span>
+                    {d.title}
+                    {d.with ? <span className={styles.dsWith}> with {d.with}</span> : null}
+                  </span>
+                </li>
+              ))}
+            </ul>
           </div>
         </section>
 
