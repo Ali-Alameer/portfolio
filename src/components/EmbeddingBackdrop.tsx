@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
+import { buildScene, drawScene, glyph, kindColour, type Kind, type Scene } from "./viz/transformerScene";
 import { rng, useCanvas, type Frame } from "./viz/useCanvas";
 import styles from "./EmbeddingBackdrop.module.css";
 
@@ -11,9 +12,13 @@ import styles from "./EmbeddingBackdrop.module.css";
    drift; every so often most of them gather into a few mixed clusters, all
    three kinds together, as if a model were learning to fuse them, then the
    clusters dissolve and regroup somewhere else. Each point is joined to its
-   nearest neighbours by faint lines, so the structure shifts as it moves. */
+   nearest neighbours by faint lines, so the structure shifts as it moves.
 
-type Kind = 0 | 1 | 2; // patch, wave, token
+   With `story`, the hero version adds the model in front of the field:
+   input tokens, a small transformer, and processed tokens flowing out into
+   the clusters (viz/transformerScene). Everything fades right down behind
+   the headline, intro and citation panel so the text stays easy to read. */
+
 type Pt = {
   kind: Kind;
   bx: number; // drift base, in 0..1 of the canvas
@@ -36,16 +41,51 @@ const NEIGHBOURS = 2;
 // [x0, x1, y0, y1]: open space, away from text and panels.
 type Area = [number, number, number, number];
 
-export default function EmbeddingBackdrop({ area = [0.55, 0.95, 0.2, 0.8] }: { area?: Area }) {
+export default function EmbeddingBackdrop({
+  area = [0.55, 0.95, 0.2, 0.8],
+  story = false,
+}: {
+  area?: Area;
+  story?: boolean;
+}) {
   const ref = useRef<HTMLCanvasElement>(null);
-  const state = useRef<{ w: number; pts: Pt[] } | null>(null);
+  const state = useRef<{ w: number; h: number; pts: Pt[]; scene: Scene | null } | null>(null);
+  const pointer = useRef<{ x: number; y: number } | null>(null);
+
+  // desktop pointers only: hovering near a token makes it the query
+  useEffect(() => {
+    if (!story) return;
+    const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!fine || reduced) return;
+    const onMove = (e: PointerEvent) => {
+      const c = ref.current;
+      if (!c) return;
+      const r = c.getBoundingClientRect();
+      const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+      pointer.current = inside ? { x: e.clientX - r.left, y: e.clientY - r.top } : null;
+    };
+    window.addEventListener("pointermove", onMove, { passive: true });
+    return () => window.removeEventListener("pointermove", onMove);
+  }, [story]);
 
   useCanvas(ref, (f) => {
     // fewer points on small screens; roughly the old density elsewhere
-    if (!state.current || Math.abs(state.current.w - f.w) > 120) {
-      state.current = { w: f.w, pts: makePoints(f.w, f.h) };
+    const st = state.current;
+    if (!st || Math.abs(st.w - f.w) > 120 || Math.abs(st.h - f.h) > 120) {
+      state.current = {
+        w: f.w,
+        h: f.h,
+        pts: makePoints(f.w, f.h, story),
+        scene: story ? buildScene(f.w, f.h) : null,
+      };
     }
-    draw(f, state.current.pts, area);
+    const { pts, scene } = state.current!;
+    const fade = story ? textFade(f.w, f.h) : () => 1;
+    // on phones the story runs top to bottom, so clusters gather below it
+    const where: Area = story && f.w < 832 ? [0.12, 0.88, 0.72, 0.94] : area;
+    const outputs = draw(f, pts, where, fade);
+    if (scene) drawScene(f.ctx, scene, f.t, f.p, fade, f.still ? null : pointer.current, outputs);
   });
 
   return (
@@ -56,10 +96,12 @@ export default function EmbeddingBackdrop({ area = [0.55, 0.95, 0.2, 0.8] }: { a
   );
 }
 
-function makePoints(w: number, h: number): Pt[] {
+function makePoints(w: number, h: number, story: boolean): Pt[] {
   const small = w < 700;
+  // the story version carries more on screen already, so it uses fewer points
+  const scale = story ? 0.7 : 1;
   const n = Math.round(
-    small ? Math.min(42, Math.max(22, (w * h) / 9000)) : Math.min(96, Math.max(36, (w * h) / 14000)),
+    scale * (small ? Math.min(42, Math.max(22, (w * h) / 9000)) : Math.min(96, Math.max(36, (w * h) / 14000))),
   );
   const rand = rng(17);
   return Array.from({ length: n }, (_, i) => {
@@ -86,7 +128,7 @@ function makePoints(w: number, h: number): Pt[] {
 // screens; anywhere on small ones, where the shade covers the whole band
 function centres(cycle: number, w: number, h: number, count: number, [x0, x1, y0, y1]: Area) {
   const rand = rng(1000 + cycle * 7);
-  const wide = w >= 832;
+  const wide = w >= 832 || y0 > 0.5;
   return Array.from({ length: count }, (_, i) => ({
     x: w * (wide ? x0 + (x1 - x0) * ((i + 0.2 + rand() * 0.6) / count) : 0.12 + 0.76 * rand()),
     y: h * (wide ? y0 + (y1 - y0) * rand() : 0.18 + 0.64 * rand()),
@@ -98,13 +140,36 @@ const smooth = (x: number) => {
   return c * c * (3 - 2 * c);
 };
 
-function draw({ ctx, w, h, t, p }: Frame, pts: Pt[], area: Area) {
+// Opacity multiplier for the hero story: very faint behind the headline and
+// intro, softer behind the frosted citation panel, full in the open space.
+function textFade(w: number, h: number) {
+  if (w < 832) return () => 0.5;
+  const zones: [number, number, number, number, number][] = [
+    // x0, x1, y0, y1 (fractions), opacity inside
+    [0.11, 0.54, 0.12, 0.9, 0.28], // eyebrow, intro, credentials, buttons
+    [0.11, 0.68, 0.25, 0.5, 0.25], // the name and its box, which run further right
+    [0.56, 0.88, 0.5, 0.97, 0.55],
+  ];
+  return (x: number, y: number) => {
+    let f = 1;
+    for (const [x0, x1, y0, y1, o] of zones) {
+      const dx = Math.max(x0 * w - x, 0, x - x1 * w);
+      const dy = Math.max(y0 * h - y, 0, y - y1 * h);
+      const inside = 1 - smooth(Math.hypot(dx, dy) / 60);
+      f = Math.min(f, 1 - (1 - o) * inside);
+    }
+    return f;
+  };
+}
+
+function draw({ ctx, w, h, t, p }: Frame, pts: Pt[], area: Area, fade: (x: number, y: number) => number) {
   const cycle = Math.floor(t / CYCLE);
   const ph = (t % CYCLE) / CYCLE;
   // two or three clusters, as many as the open area has room for
   const k = Math.min(3, Math.max(2, Math.round(((area[1] - area[0]) * w) / 200)));
   const here = centres(cycle, w, h, k, area);
-  const radius = Math.min(w, h) * (w < 700 ? 0.16 : 0.1);
+  // clusters fit the area they gather in
+  const radius = Math.min(Math.min(w, h) * (w < 700 ? 0.16 : 0.1), (area[1] - area[0]) * w * 0.45);
   const pull = (lag: number) => {
     // drift 0–30%, gather 30–55%, hold 55–75%, dissolve 75–100%
     const u = ph - lag;
@@ -139,7 +204,7 @@ function draw({ ctx, w, h, t, p }: Frame, pts: Pt[], area: Area) {
     }
     near.sort((a, b) => a[0] - b[0]);
     for (const [d, j] of near.slice(0, NEIGHBOURS)) {
-      ctx.globalAlpha = 0.16 * (1 - d / reach);
+      ctx.globalAlpha = 0.16 * (1 - d / reach) * fade((pos[i].x + pos[j].x) / 2, (pos[i].y + pos[j].y) / 2);
       ctx.beginPath();
       ctx.moveTo(pos[i].x, pos[i].y);
       ctx.lineTo(pos[j].x, pos[j].y);
@@ -150,36 +215,11 @@ function draw({ ctx, w, h, t, p }: Frame, pts: Pt[], area: Area) {
   // the points themselves
   pts.forEach((q, i) => {
     const { x, y } = pos[i];
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(q.rot);
-    ctx.lineWidth = 1;
-    if (q.kind === 0) {
-      // image patch
-      ctx.globalAlpha = 0.75;
-      ctx.strokeStyle = p.box;
-      ctx.strokeRect(-2, -2, 4, 4);
-    } else if (q.kind === 1) {
-      // time series / audio: a short wave segment
-      ctx.globalAlpha = 0.6;
-      ctx.strokeStyle = p.ink;
-      ctx.beginPath();
-      for (let u = -5; u <= 5; u += 1) {
-        const yy = Math.sin(u * 0.9 + q.ph) * 1.8;
-        if (u === -5) ctx.moveTo(u, yy);
-        else ctx.lineTo(u, yy);
-      }
-      ctx.stroke();
-    } else {
-      // text token
-      ctx.globalAlpha = 0.6;
-      ctx.strokeStyle = p.muted;
-      ctx.beginPath();
-      ctx.moveTo(-3.5, 0);
-      ctx.lineTo(3.5, 0);
-      ctx.stroke();
-    }
-    ctx.restore();
+    ctx.globalAlpha = (q.kind === 0 ? 0.75 : 0.6) * fade(x, y);
+    glyph(ctx, q.kind, x, y, 1, q.rot, q.ph, kindColour(q.kind, p));
   });
   ctx.globalAlpha = 1;
+
+  // where processed tokens from the model land: points currently clustering
+  return pos.filter((_, i) => pts[i].joins);
 }

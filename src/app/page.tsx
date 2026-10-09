@@ -88,8 +88,10 @@ export default function Home() {
       <main id="main">
         {/* Hero ------------------------------------------------------- */}
         <section className={styles.hero} aria-labelledby="hero-name">
-          {/* clusters gather above the citation panel, right of the name */}
-          <EmbeddingBackdrop area={[0.71, 0.97, 0.08, 0.38]} />
+          {/* the model's story runs left to right through the open space
+              above the citation panel; its outputs join clusters at the
+              right edge */}
+          <EmbeddingBackdrop area={[0.88, 0.99, 0.1, 0.42]} story />
           <p className={`${styles.eyebrow} ${styles.enter}`} style={step(0)}>
             {profile.role} · {profile.university}
           </p>
