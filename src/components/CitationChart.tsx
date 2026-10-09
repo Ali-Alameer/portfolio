@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { scholarStats } from "@/data/profile";
 import styles from "./CitationChart.module.css";
 
@@ -36,6 +37,7 @@ export default function CitationChart() {
                 width={barW}
                 height={BASE - y(d.count)}
                 className={partial ? styles.partial : styles.bar}
+                style={{ "--i": i } as CSSProperties}
               >
                 <title>{`${d.year}: ${d.count} citations${partial ? " (year to date)" : ""}`}</title>
               </rect>

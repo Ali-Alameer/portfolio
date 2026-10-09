@@ -28,6 +28,10 @@
   border-radius: var(--radius);
   padding: 0.5rem 0.7rem;
   cursor: pointer;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s,
+    color 0.2s;
 }
 
 .chip:hover {
@@ -98,6 +102,10 @@
   color: var(--muted);
 }
 
+.animated .row {
+  animation: rise 0.5s var(--ease) calc(var(--i, 0) * 30ms) both;
+}
+
 .main {
   display: grid;
   gap: 0.25rem;
@@ -142,5 +150,12 @@
   }
   .year {
     grid-column: 1 / -1;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
   }
 }

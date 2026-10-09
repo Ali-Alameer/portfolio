@@ -25,8 +25,9 @@ export const metadata: Metadata = {
 };
 
 // Applies a saved theme choice before first paint. With no saved choice the
-// attribute stays unset and the CSS follows prefers-color-scheme.
-const themeScript = `(function(){try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}})()`;
+// attribute stays unset and the CSS follows prefers-color-scheme. data-js lets
+// the CSS hide scroll-reveal blocks only when a script is there to show them.
+const themeScript = `(function(){document.documentElement.setAttribute("data-js","");try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}})()`;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type CSSProperties } from "react";
 import { publications, themes, type ThemeId } from "@/data/profile";
 import styles from "./Publications.module.css";
 
@@ -100,9 +100,10 @@ export default function Publications() {
         </label>
       </div>
 
-      <ol className={styles.list}>
-        {rows.map((p) => (
-          <li key={p.title} className={styles.row}>
+      {/* keyed on the view so a new filter or sort replays the row entrance */}
+      <ol key={`${filter}-${sort}`} className={`${styles.list} ${styles.animated}`}>
+        {rows.map((p, i) => (
+          <li key={p.title} className={styles.row} style={{ "--i": Math.min(i, 12) } as CSSProperties}>
             <span className={styles.year}>{p.year}</span>
             <div className={styles.main}>
               <h3 className={styles.title}>

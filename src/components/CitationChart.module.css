@@ -16,8 +16,26 @@
   stroke-width: 1;
 }
 
+.bar,
+.partial {
+  transform-box: fill-box;
+  transform-origin: bottom;
+  /* bars grow from the baseline left to right, after the panel arrives */
+  animation: grow 0.9s cubic-bezier(0.22, 1, 0.36, 1) calc(500ms + var(--i, 0) * 60ms) both;
+}
+
 .bar {
   fill: var(--box);
+}
+
+.value {
+  animation: fade 0.5s ease-out 1.4s both;
+}
+
+@keyframes grow {
+  from {
+    transform: scaleY(0);
+  }
 }
 
 .partial {
@@ -51,4 +69,10 @@
   margin: 0;
   font: var(--step--1) / 1.4 var(--font-m);
   color: var(--muted);
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
 }

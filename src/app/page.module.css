@@ -50,12 +50,37 @@
 }
 
 .nav a {
+  position: relative;
   text-decoration: none;
   color: var(--muted);
+  transition: color 0.2s;
+}
+
+/* underline draws in from the left on hover and for the section in view */
+.nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.2rem;
+  height: 1.5px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s var(--ease);
 }
 
 .nav a:hover {
   color: var(--box);
+}
+
+.nav a[aria-current] {
+  color: var(--ink);
+}
+
+.nav a:hover::after,
+.nav a[aria-current]::after {
+  transform: scaleX(1);
 }
 
 @media (max-width: 40rem) {
@@ -97,6 +122,26 @@
 }
 
 /* Hero -------------------------------------------------------------- */
+/* Hero elements rise in on load, staggered by --i (set in page.tsx). */
+.enter {
+  animation: rise 0.9s var(--ease) calc(80ms + var(--i, 0) * 110ms) both;
+}
+
+/* CSS Modules scope keyframe names per file, so the shared rise and fade
+   from globals.css are repeated here and in the component modules. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
 .hero {
   display: grid;
   gap: clamp(1.5rem, 4vw, 2.5rem);
@@ -130,7 +175,7 @@
   border: 2px solid var(--box);
   pointer-events: none;
   transform-origin: 30% 60%;
-  animation: lock 1.1s cubic-bezier(0.2, 0.7, 0.2, 1) 0.2s both;
+  animation: lock 1.1s cubic-bezier(0.2, 0.7, 0.2, 1) 0.45s both;
 }
 
 /* corner handles, as drawn by annotation tools */
@@ -163,6 +208,7 @@
   background: var(--box);
   padding: 0.35em 0.55em;
   white-space: nowrap;
+  animation: fade 0.4s ease-out 1.1s both;
 }
 
 /* The box starts loose and offset, then settles tightly around the word,
@@ -228,6 +274,25 @@
   padding: 0.8rem 1.1rem;
   border-radius: var(--radius);
   border: 1px solid var(--box);
+  transition:
+    transform 0.25s var(--ease),
+    border-color 0.2s,
+    box-shadow 0.25s var(--ease),
+    filter 0.2s;
+}
+
+.primary:hover,
+.secondary:hover {
+  transform: translateY(-2px);
+}
+
+.primary:hover {
+  box-shadow: 0 6px 18px -8px var(--box);
+}
+
+.primary:active,
+.secondary:active {
+  transform: none;
 }
 
 .primary {
@@ -303,6 +368,26 @@
   gap: 0.75rem;
   padding-top: 1.25rem;
   border-top: 1px solid var(--ink);
+}
+
+/* tags draw their box when the card arrives, echoing the hero box */
+[data-shown] > .tag {
+  animation: tagLock 0.7s var(--ease) calc(250ms + var(--i, 0) * var(--stagger)) both;
+}
+
+@keyframes tagLock {
+  from {
+    opacity: 0;
+    outline: 1.5px solid var(--box);
+    outline-offset: 6px;
+  }
+  60% {
+    opacity: 1;
+  }
+  to {
+    outline: 1.5px solid transparent;
+    outline-offset: -1.5px;
+  }
 }
 
 .theme h3 {
@@ -395,6 +480,14 @@
   font-weight: 600;
 }
 
+.table tbody tr {
+  transition: background-color 0.2s;
+}
+
+.table tbody tr:hover {
+  background: var(--surface);
+}
+
 .table .num {
   text-align: right;
   padding-right: 0;
@@ -459,12 +552,17 @@
   border: 1px solid var(--line);
   border-radius: var(--radius);
   text-decoration: none;
-  transition: border-color 0.15s;
+  transition:
+    border-color 0.2s,
+    transform 0.3s var(--ease),
+    box-shadow 0.3s var(--ease);
 }
 
 .module:hover {
   color: inherit;
   border-color: var(--box);
+  transform: translateY(-3px);
+  box-shadow: 0 14px 30px -18px color-mix(in srgb, var(--box) 60%, transparent);
 }
 
 .moduleProg {
@@ -589,6 +687,12 @@
   letter-spacing: -0.02em;
   color: var(--box);
   overflow-wrap: anywhere;
+  text-decoration-color: transparent;
+  transition: text-decoration-color 0.25s;
+}
+
+.email:hover {
+  text-decoration-color: currentColor;
 }
 
 .contactLinks {

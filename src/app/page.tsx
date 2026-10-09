@@ -1,5 +1,8 @@
+import type { CSSProperties } from "react";
 import CitationChart from "@/components/CitationChart";
+import CountUp from "@/components/CountUp";
 import Publications, { SelectedPublications } from "@/components/Publications";
+import Reveal from "@/components/Reveal";
 import ThemeToggle from "@/components/ThemeToggle";
 import {
   datasets,
@@ -20,6 +23,9 @@ const gbp = new Intl.NumberFormat("en-GB", {
   maximumFractionDigits: 0,
 });
 const nf = new Intl.NumberFormat("en-GB");
+
+// Stagger step for entrance and reveal animations, read by the CSS as --i.
+const step = (i: number) => ({ "--i": i }) as CSSProperties;
 
 const nav = [
   { href: "#research", label: "Research" },
@@ -59,10 +65,10 @@ export default function Home() {
       <main id="main">
         {/* Hero ------------------------------------------------------- */}
         <section className={styles.hero} aria-labelledby="hero-name">
-          <p className={styles.eyebrow}>
+          <p className={`${styles.eyebrow} ${styles.enter}`} style={step(0)}>
             {profile.role} · {profile.university}
           </p>
-          <h1 id="hero-name" className={styles.name}>
+          <h1 id="hero-name" className={`${styles.name} ${styles.enter}`} style={step(1)}>
             <span className={styles.honorific}>{profile.honorific}</span> Ali{" "}
             <span className={styles.detect}>
               Alameer
@@ -74,11 +80,11 @@ export default function Home() {
 
           <div className={styles.heroGrid}>
             <div className={styles.heroText}>
-              <p className={styles.lede}>{profile.summary}</p>
-              <p className={styles.credentials}>
+              <p className={`${styles.lede} ${styles.enter}`} style={step(2)}>{profile.summary}</p>
+              <p className={`${styles.credentials} ${styles.enter}`} style={step(3)}>
                 {profile.phd}. {profile.senate}. {profile.school}.
               </p>
-              <div className={styles.actions}>
+              <div className={`${styles.actions} ${styles.enter}`} style={step(4)}>
                 <a className={styles.primary} href={`mailto:${profile.email}`}>
                   Email me
                 </a>
@@ -91,19 +97,25 @@ export default function Home() {
               </div>
             </div>
 
-            <aside className={styles.metrics} aria-label="Citation metrics">
+            <aside className={`${styles.metrics} ${styles.enter}`} style={step(3)} aria-label="Citation metrics">
               <dl className={styles.stats}>
                 <div>
                   <dt>Citations</dt>
-                  <dd>{nf.format(scholarStats.citations.all)}</dd>
+                  <dd>
+                    <CountUp value={scholarStats.citations.all} delay={500} />
+                  </dd>
                 </div>
                 <div>
                   <dt>h-index</dt>
-                  <dd>{scholarStats.hIndex.all}</dd>
+                  <dd>
+                    <CountUp value={scholarStats.hIndex.all} delay={600} />
+                  </dd>
                 </div>
                 <div>
                   <dt>i10-index</dt>
-                  <dd>{scholarStats.i10.all}</dd>
+                  <dd>
+                    <CountUp value={scholarStats.i10.all} delay={700} />
+                  </dd>
                 </div>
               </dl>
               <CitationChart />
@@ -113,7 +125,7 @@ export default function Home() {
 
         {/* Selected publications ---------------------------------- */}
         <section id="selected" className={styles.section} aria-labelledby="selected-h">
-          <div className={styles.sectionHead}>
+          <div className={styles.sectionHead} data-reveal>
             <p className={styles.eyebrow}>Selected publications</p>
             <h2 id="selected-h">Five most cited papers</h2>
             <p className={styles.intro}>
@@ -121,12 +133,14 @@ export default function Home() {
               <a href="#publications">Publications</a> below.
             </p>
           </div>
-          <SelectedPublications />
+          <div data-reveal>
+            <SelectedPublications />
+          </div>
         </section>
 
         {/* Research --------------------------------------------------- */}
         <section id="research" className={styles.section} aria-labelledby="research-h">
-          <div className={styles.sectionHead}>
+          <div className={styles.sectionHead} data-reveal>
             <p className={styles.eyebrow}>Research</p>
             <h2 id="research-h">AI that has to work outside the lab</h2>
             <p className={styles.intro}>
@@ -136,8 +150,8 @@ export default function Home() {
             </p>
           </div>
           <div className={styles.themes}>
-            {themes.map((t) => (
-              <article key={t.id} className={styles.theme}>
+            {themes.map((t, i) => (
+              <article key={t.id} className={styles.theme} data-reveal style={step(i % 2)}>
                 <p className={styles.tag}>{t.tag}</p>
                 <h3>{t.title}</h3>
                 <p>{t.body}</p>
@@ -155,7 +169,7 @@ export default function Home() {
 
         {/* Funding ---------------------------------------------------- */}
         <section id="funding" className={styles.section} aria-labelledby="funding-h">
-          <div className={styles.sectionHead}>
+          <div className={styles.sectionHead} data-reveal>
             <p className={styles.eyebrow}>Funding</p>
             <h2 id="funding-h">Grants, KTPs and consultancy</h2>
             <p className={styles.intro}>
@@ -165,7 +179,7 @@ export default function Home() {
               company.
             </p>
           </div>
-          <div className={styles.tableWrap}>
+          <div className={styles.tableWrap} data-reveal>
             <table className={styles.table}>
               <thead>
                 <tr>
@@ -179,8 +193,8 @@ export default function Home() {
                 </tr>
               </thead>
               <tbody>
-                {grants.map((g) => (
-                  <tr key={g.title}>
+                {grants.map((g, i) => (
+                  <tr key={g.title} style={step(i)}>
                     <th scope="row">{g.title}</th>
                     <td>
                       {g.funder}
@@ -202,7 +216,7 @@ export default function Home() {
 
         {/* Teaching & supervision ------------------------------------- */}
         <section id="teaching" className={styles.section} aria-labelledby="teaching-h">
-          <div className={styles.sectionHead}>
+          <div className={styles.sectionHead} data-reveal>
             <p className={styles.eyebrow}>Teaching</p>
             <h2 id="teaching-h">Modules I designed and lead</h2>
             <p className={styles.intro}>
@@ -212,8 +226,10 @@ export default function Home() {
           </div>
 
           <div className={styles.modules}>
-            {modules.map((m) => (
+            {modules.map((m, i) => (
               <a
+                data-reveal
+                style={step(i)}
                 key={m.repo}
                 className={styles.module}
                 href={`${profile.links.github}/${m.repo}`}
@@ -230,7 +246,7 @@ export default function Home() {
             ))}
           </div>
 
-          <ul className={styles.repos}>
+          <ul className={styles.repos} data-reveal>
             {repos.map((r) => (
               <li key={r.name}>
                 <a href={`${profile.links.github}/${r.name}`} target="_blank" rel="noreferrer">
@@ -241,7 +257,7 @@ export default function Home() {
             ))}
           </ul>
 
-          <div className={styles.people}>
+          <div className={styles.people} data-reveal>
             <div>
               <h3>Current research students</h3>
               <ul>
@@ -284,7 +300,7 @@ export default function Home() {
 
         {/* Publications ----------------------------------------------- */}
         <section id="publications" className={styles.section} aria-labelledby="pubs-h">
-          <div className={styles.sectionHead}>
+          <div className={styles.sectionHead} data-reveal>
             <p className={styles.eyebrow}>Publications</p>
             <h2 id="pubs-h">Papers, 2015 to {Math.max(...publications.map((p) => p.year))}</h2>
             <p className={styles.intro}>
@@ -292,9 +308,11 @@ export default function Home() {
               Scholar ({scholarStats.asOf}). Titles link to a Scholar search for the paper.
             </p>
           </div>
-          <Publications />
+          <div data-reveal>
+            <Publications />
+          </div>
 
-          <div className={styles.datasets}>
+          <div className={styles.datasets} data-reveal>
             <h3>Open datasets</h3>
             <ul>
               {datasets.map((d) => (
@@ -311,7 +329,7 @@ export default function Home() {
         </section>
 
         {/* Contact ---------------------------------------------------- */}
-        <section id="contact" className={styles.contact} aria-labelledby="contact-h">
+        <section id="contact" className={styles.contact} aria-labelledby="contact-h" data-reveal>
           <p className={styles.eyebrow}>Contact</p>
           <h2 id="contact-h">
             Working on a vision or language problem? I&apos;m open to KTPs, PhD applicants and
@@ -351,6 +369,7 @@ export default function Home() {
         </span>
         <span>{profile.school}, {profile.university}, Salford, UK</span>
       </footer>
+      <Reveal />
     </div>
   );
 }
