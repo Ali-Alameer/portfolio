@@ -54,6 +54,7 @@ export default function CitationChart() {
       <figcaption className={styles.caption}>
         Citations per year, Google Scholar. {last.year} is year to date ({scholarStats.asOf}).
       </figcaption>
+      <p className={styles.updated}>Last updated: {scholarStats.lastUpdated}</p>
     </figure>
   );
 }
