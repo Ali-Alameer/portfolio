@@ -436,6 +436,25 @@
   }
 }
 
+/* The hero figure in the flow, single-column layouts only; edge to edge so
+   it is as large as the screen allows. Keeps the figure's proportions. */
+.vitInline {
+  display: none;
+}
+
+@media (max-width: 51.99rem) {
+  .vitInline {
+    display: block;
+    margin-inline: calc(-1 * var(--gutter) + 4px);
+  }
+}
+
+.vitCanvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 440 / 372;
+}
+
 .heroText {
   display: grid;
   gap: 1.25rem;

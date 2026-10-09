@@ -9,6 +9,7 @@ import SignalTrace from "@/components/viz/SignalTrace";
 import StrandVisual from "@/components/viz/StrandVisual";
 import EmbeddingBackdrop from "@/components/EmbeddingBackdrop";
 import VitBackdrop from "@/components/VitBackdrop";
+import VitInline from "@/components/VitInline";
 import Publications, { SelectedPublications } from "@/components/Publications";
 import Interactions from "@/components/Interactions";
 import Reveal from "@/components/Reveal";
@@ -116,6 +117,11 @@ export default function Home() {
                   GitHub
                 </a>
               </div>
+            </div>
+
+            {/* phones and narrow tablets: the hero figure sits here, below the intro */}
+            <div className={`${styles.vitInline} ${styles.enter}`} style={step(5)}>
+              <VitInline className={styles.vitCanvas} />
             </div>
 
             <aside className={`${styles.metrics} ${styles.enter}`} style={step(3)} aria-label="Citation metrics">

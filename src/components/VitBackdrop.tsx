@@ -7,9 +7,10 @@ import styles from "./EmbeddingBackdrop.module.css";
 
 // The hero's only animation: a vision transformer reading a ceiling-camera
 // frame of a pig pen, from image to prediction (viz/vitFigure), placed in
-// the open space at the upper right so the name and intro stay clear. Hidden where the hero is a
-// single column (phones, narrow tablets): at that size its numbers would be
-// too small to read. Under reduced motion it shows the finished pass, still.
+// the open space at the upper right so the name and intro stay clear. Where
+// the hero is a single column (phones, narrow tablets) it draws nothing
+// here; VitInline shows it below the intro instead. Under reduced motion it
+// shows the finished pass, still.
 export default function VitBackdrop() {
   const ref = useRef<HTMLCanvasElement>(null);
   const mono = useRef("");
