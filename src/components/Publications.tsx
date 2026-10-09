@@ -16,6 +16,33 @@ function paperUrl(p: Publication) {
     : `https://scholar.google.com/scholar?q=${encodeURIComponent(`"${p.title}"`)}`;
 }
 
+// Journal article, conference paper or thesis, read from the venue. This
+// matches the record types Crossref gives for every paper with a DOI.
+type Kind = "journal" | "conference" | "thesis";
+function paperKind(p: Publication): Kind {
+  if (/thesis/i.test(p.venue)) return "thesis";
+  if (/conference|INISTA/i.test(p.venue)) return "conference";
+  return "journal";
+}
+
+// Minimal line icons for the three kinds; decorative only.
+const KIND_PATHS: Record<Kind, string> = {
+  // a page with a folded corner and lines of text
+  journal: "M3 1.5h5.5L11 4v8.5H3z M8.5 1.5V4H11 M5 7h4 M5 9h4 M5 11h2.5",
+  // a presentation screen on a stand
+  conference: "M1.5 2h11v7h-11z M7 9v3 M4.5 12.5h5 M3.5 7l2-2 2 1.5 3-3",
+  // a mortarboard
+  thesis: "M1 5.2 7 2.2l6 3-6 3z M3.5 6.6v3c0 1.2 7 1.2 7 0v-3 M12.6 5.4v3.6",
+};
+
+function KindIcon({ kind }: { kind: Kind }) {
+  return (
+    <svg className={styles.kindIcon} viewBox="0 0 14 14" aria-hidden="true" data-kind={kind}>
+      <path d={KIND_PATHS[kind]} />
+    </svg>
+  );
+}
+
 function Authors({ text }: { text: string }) {
   const parts = text.split(/(A Alameer)/);
   return (
@@ -44,6 +71,7 @@ export function SelectedPublications({ count = 5 }: { count?: number }) {
         <li
           key={p.title}
           className={styles.card}
+          data-reg
           style={{ "--i": i } as CSSProperties}
           onPointerEnter={(e) => focusNode(e.currentTarget, i)}
           onPointerLeave={(e) => focusNode(e.currentTarget, null)}
@@ -219,7 +247,10 @@ export default function Publications() {
             {(i === 0 || rows[i - 1].year !== p.year) && (
               <span className={styles.dot} data-link={`y${p.year}`} data-link-trigger aria-hidden="true" />
             )}
-            <span className={styles.year}>{p.year}</span>
+            <span className={styles.year}>
+              {p.year}
+              <KindIcon kind={paperKind(p)} />
+            </span>
             <div className={styles.main}>
               <h3 className={styles.title}>
                 <a

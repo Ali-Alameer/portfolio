@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import CitationChart from "@/components/CitationChart";
 import CountUp from "@/components/CountUp";
 import CitationNetwork from "@/components/viz/CitationNetwork";
+import Coauthors from "@/components/viz/Coauthors";
 import ForwardPass from "@/components/viz/ForwardPass";
 import LossCurve from "@/components/viz/LossCurve";
 import SignalTrace from "@/components/viz/SignalTrace";
@@ -309,6 +310,7 @@ export default function Home() {
             {modules.map((m, i) => (
               <a
                 data-reveal
+                data-reg
                 style={step(i)}
                 key={m.repo}
                 className={styles.module}
@@ -328,7 +330,7 @@ export default function Home() {
 
           <ul className={styles.repos} data-stagger>
             {repos.map((r) => (
-              <li key={r.name}>
+              <li key={r.name} data-reg>
                 <a href={`${profile.links.github}/${r.name}`} target="_blank" rel="noreferrer">
                   {r.name}
                 </a>
@@ -394,6 +396,7 @@ export default function Home() {
               there is no DOI.
             </p>
           </div>
+          <Coauthors />
           <div data-reveal>
             <Publications />
           </div>

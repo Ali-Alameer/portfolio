@@ -117,6 +117,33 @@
   margin-inline: calc(50% - 50vw);
   padding-inline: calc(50vw - 50%);
   padding-block: clamp(4rem, 9vw, 7rem);
+  /* a very fine grain so the bands don't read as flat fills */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
+/* Hairline axis ticks down the left edge of each band, minor every 12px
+   and major every 60px, like the axis of a figure. Only where there is
+   margin to spare beside the content. */
+@media (min-width: 80rem) {
+  .section {
+    background-image:
+      repeating-linear-gradient(to bottom, var(--muted) 0 1px, transparent 1px 60px),
+      repeating-linear-gradient(to bottom, var(--line) 0 1px, transparent 1px 12px),
+      linear-gradient(var(--line), var(--line)),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23g)'/%3E%3C/svg%3E");
+    background-size:
+      11px 100%,
+      6px 100%,
+      1px 100%,
+      160px 160px;
+    background-position:
+      24px 0,
+      24px 0,
+      24px 0,
+      0 0;
+    background-repeat: no-repeat, no-repeat, no-repeat, repeat;
+  }
 }
 
 .section::before {
@@ -132,7 +159,7 @@
 }
 
 .tinted {
-  background: var(--band);
+  background-color: var(--band);
 }
 
 .tinted::before {
@@ -1046,7 +1073,6 @@
    on touch screens it runs once as the card scrolls in */
 .module {
   position: relative;
-  overflow: hidden;
 }
 
 .module::before {
@@ -1056,6 +1082,7 @@
   left: 0;
   right: 0;
   height: 2px;
+  border-radius: var(--radius) var(--radius) 0 0;
   background: var(--box);
   transform: scaleX(0);
   transform-origin: left;

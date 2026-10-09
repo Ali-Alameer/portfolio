@@ -95,6 +95,27 @@
   display: grid;
 }
 
+.kindIcon {
+  display: block;
+  width: 14px;
+  height: 14px;
+  margin-top: 0.45rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.8;
+}
+
+@media (max-width: 34rem) {
+  .kindIcon {
+    display: inline-block;
+    margin: 0 0 0 0.5rem;
+    vertical-align: -2px;
+  }
+}
+
 .citesLabel {
   font-size: 0.7rem;
   letter-spacing: 0.06em;

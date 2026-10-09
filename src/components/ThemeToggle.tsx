@@ -22,6 +22,14 @@ export default function ThemeToggle() {
 
   function next() {
     const n = order[(order.indexOf(choice) + 1) % order.length];
+    // wipe the new theme down the page where view transitions are available
+    // (see globals.css); otherwise, or under reduced motion, switch at once
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (document.startViewTransition && !reduced) document.startViewTransition(() => apply(n));
+    else apply(n);
+  }
+
+  function apply(n: Choice) {
     const root = document.documentElement;
     try {
       if (n === "system") {

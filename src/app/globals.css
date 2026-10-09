@@ -79,6 +79,8 @@ body {
   font-family: var(--font-b);
   font-size: var(--step-0);
   line-height: 1.6;
+  /* evenly spaced figures everywhere, so numbers line up */
+  font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -224,6 +226,47 @@ img {
   100% {
     top: calc(100% - 2.5rem);
     opacity: 0;
+  }
+}
+
+/* Registration marks: small crop marks just outside each corner of a
+   [data-reg] card, as on a printed figure. */
+[data-reg]::after {
+  --reg: color-mix(in srgb, var(--muted) 55%, transparent);
+  content: "";
+  position: absolute;
+  inset: -8px;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--reg), var(--reg)) left 0 top 8px / 5px 1px,
+    linear-gradient(var(--reg), var(--reg)) left 8px top 0 / 1px 5px,
+    linear-gradient(var(--reg), var(--reg)) right 0 top 8px / 5px 1px,
+    linear-gradient(var(--reg), var(--reg)) right 8px top 0 / 1px 5px,
+    linear-gradient(var(--reg), var(--reg)) left 0 bottom 8px / 5px 1px,
+    linear-gradient(var(--reg), var(--reg)) left 8px bottom 0 / 1px 5px,
+    linear-gradient(var(--reg), var(--reg)) right 0 bottom 8px / 5px 1px,
+    linear-gradient(var(--reg), var(--reg)) right 8px bottom 0 / 1px 5px;
+  background-repeat: no-repeat;
+}
+
+/* Theme switch: the new theme wipes down the page like a scan line rather
+   than switching at once (ThemeToggle uses a view transition). */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(root) {
+  animation: theme-wipe 0.9s cubic-bezier(0.45, 0, 0.2, 1);
+}
+
+@keyframes theme-wipe {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
   }
 }
 

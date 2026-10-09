@@ -1,0 +1,132 @@
+.figure {
+  position: relative;
+  margin: 0;
+  /* auto margins would shrink a grid item to its content; size it explicitly */
+  width: 100%;
+  max-width: 46rem;
+  margin-inline: auto;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.ring {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 1;
+  stroke-dasharray: 2 4;
+}
+
+.tick {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.spoke {
+  stroke: var(--muted);
+  stroke-width: 0.75;
+  opacity: 0.3;
+  transition: opacity 0.25s;
+}
+
+.spoke[data-hot] {
+  stroke: var(--box);
+  opacity: 0.9;
+}
+
+.pair {
+  stroke: var(--box);
+  stroke-width: 0.75;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.node {
+  cursor: default;
+  transition: opacity 0.25s;
+}
+
+.hit {
+  fill: transparent;
+}
+
+.dot {
+  fill: var(--paper);
+  stroke: var(--box);
+  stroke-width: 1.25;
+  transition: fill 0.2s;
+}
+
+/* sectors keep one colour; strands are told apart by position */
+.node[data-hot] .dot {
+  fill: var(--box);
+}
+
+.node[data-dim],
+.spoke[data-dim] {
+  opacity: 0.18;
+}
+
+.me {
+  fill: var(--ink);
+}
+
+.meRing {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1;
+  opacity: 0.5;
+}
+
+/* name label, HTML so it stays a readable size at any width */
+.label {
+  position: absolute;
+  transform: translate(-50%, calc(-100% - 12px));
+  padding: 0.3rem 0.5rem;
+  font: 500 0.75rem / 1 var(--font-m);
+  color: var(--box-ink);
+  background: var(--box);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* draw-in when the figure first scrolls into view */
+:root[data-js] .figure:not([data-shown]) :is(.spoke, .node) {
+  opacity: 0;
+}
+
+.figure[data-shown] .spoke {
+  animation: fade-in 0.6s ease-out calc(200ms + var(--i) * 18ms) both;
+}
+
+.figure[data-shown] .node {
+  animation: pop-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) calc(300ms + var(--i) * 18ms) both;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+.node {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@media (max-width: 40rem) {
+  .tick {
+    display: none;
+  }
+}

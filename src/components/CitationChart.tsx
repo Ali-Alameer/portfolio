@@ -17,6 +17,15 @@ export default function CitationChart() {
   const peak = data.find((d) => d.count === max)!;
   const last = data[data.length - 1];
 
+  // running total through each year, on its own scale (axis-free, shape
+  // only), topping out just above the bar labels
+  const totals = data.reduce<number[]>((acc, d) => [...acc, (acc.at(-1) ?? 0) + d.count], []);
+  const run = totals[totals.length - 1];
+  const cumY = (v: number) => BASE - (v / run) * (BASE - 6);
+  const cumPath = totals
+    .map((v, i) => `${i ? "L" : "M"}${(i * slot + slot / 2).toFixed(1)},${cumY(v).toFixed(1)}`)
+    .join("");
+
   return (
     <figure className={styles.figure} data-inview>
       <svg
@@ -52,6 +61,8 @@ export default function CitationChart() {
             </g>
           );
         })}
+        <path d={cumPath} pathLength={1} className={styles.cumulative} />
+        <circle cx={W - slot / 2} cy={cumY(run)} r={2} className={styles.cumulativeEnd} />
       </svg>
       <figcaption className={styles.caption}>
         Citations per year, Google Scholar. {last.year} is year to date ({scholarStats.asOf}).
