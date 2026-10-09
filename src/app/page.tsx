@@ -7,7 +7,7 @@ import ForwardPass from "@/components/viz/ForwardPass";
 import LossCurve from "@/components/viz/LossCurve";
 import SignalTrace from "@/components/viz/SignalTrace";
 import StrandVisual from "@/components/viz/StrandVisual";
-import NetworkBackdrop from "@/components/NetworkBackdrop";
+import EmbeddingBackdrop from "@/components/EmbeddingBackdrop";
 import Publications, { SelectedPublications } from "@/components/Publications";
 import Interactions from "@/components/Interactions";
 import Reveal from "@/components/Reveal";
@@ -88,7 +88,8 @@ export default function Home() {
       <main id="main">
         {/* Hero ------------------------------------------------------- */}
         <section className={styles.hero} aria-labelledby="hero-name">
-          <NetworkBackdrop />
+          {/* clusters gather above the citation panel, right of the name */}
+          <EmbeddingBackdrop area={[0.71, 0.97, 0.08, 0.38]} />
           <p className={`${styles.eyebrow} ${styles.enter}`} style={step(0)}>
             {profile.role} · {profile.university}
           </p>
@@ -404,7 +405,7 @@ export default function Home() {
 
         {/* Contact ---------------------------------------------------- */}
         <section id="contact" className={styles.contact} aria-labelledby="contact-h">
-          <NetworkBackdrop />
+          <EmbeddingBackdrop />
           <div className={styles.contactInner} data-reveal>
           <p className={styles.eyebrow}>Contact</p>
           <h2 id="contact-h">

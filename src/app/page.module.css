@@ -349,7 +349,7 @@
 }
 
 /* The hero and contact are full-bleed dark bands over the animated network
-   (components/NetworkBackdrop). They always use the dark palette, whatever
+   (components/EmbeddingBackdrop). They always use the dark palette, whatever
    the page theme, so text stays legible over the backdrop. */
 .hero,
 .contact {

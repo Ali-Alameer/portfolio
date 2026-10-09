@@ -1,9 +1,7 @@
-/* Fills a dark band (hero, contact) behind its content: a dark field with two soft colour
-   glows, the canvas network on top, and a shade that keeps the text column
-   darkest. */
+/* Fills a dark band (hero, contact) behind its content: a dark field with
+   two soft colour glows, the embedding-space canvas on top, and a shade that
+   keeps the text column darkest. */
 .backdrop {
-  --net-accent: #a3a6ff;
-  --net-line: 214, 222, 217;
   position: absolute;
   inset: 0;
   z-index: -1;

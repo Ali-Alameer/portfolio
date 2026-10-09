@@ -1,0 +1,185 @@
+"use client";
+
+import { useRef } from "react";
+import { rng, useCanvas, type Frame } from "./viz/useCanvas";
+import styles from "./EmbeddingBackdrop.module.css";
+
+/* A living "embedding space" behind the hero and contact bands, drawn like
+   a t-SNE / UMAP plot of multimodal data. Three kinds of point stand for
+   the three kinds of data: tiny squares (image patches), short wave
+   segments (time series and audio) and small dashes (text tokens). Points
+   drift; every so often most of them gather into a few mixed clusters, all
+   three kinds together, as if a model were learning to fuse them, then the
+   clusters dissolve and regroup somewhere else. Each point is joined to its
+   nearest neighbours by faint lines, so the structure shifts as it moves. */
+
+type Kind = 0 | 1 | 2; // patch, wave, token
+type Pt = {
+  kind: Kind;
+  bx: number; // drift base, in 0..1 of the canvas
+  by: number;
+  ax: number; // drift amplitude and phase
+  ay: number;
+  ph: number;
+  sp: number;
+  rot: number; // fixed orientation for dashes and waves
+  joins: boolean; // takes part in clustering
+  lag: number; // personal delay, so clusters form gradually
+  ox: number; // offset within its cluster
+  oy: number;
+};
+
+const CYCLE = 26000; // ms: drift, gather, hold, dissolve
+const NEIGHBOURS = 2;
+
+// Where clusters may form on wide screens, as fractions of the band
+// [x0, x1, y0, y1]: open space, away from text and panels.
+type Area = [number, number, number, number];
+
+export default function EmbeddingBackdrop({ area = [0.55, 0.95, 0.2, 0.8] }: { area?: Area }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const state = useRef<{ w: number; pts: Pt[] } | null>(null);
+
+  useCanvas(ref, (f) => {
+    // fewer points on small screens; roughly the old density elsewhere
+    if (!state.current || Math.abs(state.current.w - f.w) > 120) {
+      state.current = { w: f.w, pts: makePoints(f.w, f.h) };
+    }
+    draw(f, state.current.pts, area);
+  });
+
+  return (
+    <div className={styles.backdrop} aria-hidden="true">
+      <canvas ref={ref} className={styles.canvas} />
+      <div className={styles.shade} />
+    </div>
+  );
+}
+
+function makePoints(w: number, h: number): Pt[] {
+  const small = w < 700;
+  const n = Math.round(
+    small ? Math.min(42, Math.max(22, (w * h) / 9000)) : Math.min(96, Math.max(36, (w * h) / 14000)),
+  );
+  const rand = rng(17);
+  return Array.from({ length: n }, (_, i) => {
+    const a = rand() * Math.PI * 2;
+    const d = Math.sqrt(rand());
+    return {
+      kind: (i % 3) as Kind,
+      bx: rand(),
+      by: rand(),
+      ax: 0.02 + rand() * 0.05,
+      ay: 0.02 + rand() * 0.05,
+      ph: rand() * Math.PI * 2,
+      sp: 0.6 + rand() * 0.8,
+      rot: (rand() - 0.5) * 0.9,
+      joins: rand() < 0.72,
+      lag: rand() * 0.12,
+      ox: Math.cos(a) * d,
+      oy: Math.sin(a) * d,
+    };
+  });
+}
+
+// cluster centres for a given cycle: spread across the open area on wide
+// screens; anywhere on small ones, where the shade covers the whole band
+function centres(cycle: number, w: number, h: number, count: number, [x0, x1, y0, y1]: Area) {
+  const rand = rng(1000 + cycle * 7);
+  const wide = w >= 832;
+  return Array.from({ length: count }, (_, i) => ({
+    x: w * (wide ? x0 + (x1 - x0) * ((i + 0.2 + rand() * 0.6) / count) : 0.12 + 0.76 * rand()),
+    y: h * (wide ? y0 + (y1 - y0) * rand() : 0.18 + 0.64 * rand()),
+  }));
+}
+
+const smooth = (x: number) => {
+  const c = Math.min(Math.max(x, 0), 1);
+  return c * c * (3 - 2 * c);
+};
+
+function draw({ ctx, w, h, t, p }: Frame, pts: Pt[], area: Area) {
+  const cycle = Math.floor(t / CYCLE);
+  const ph = (t % CYCLE) / CYCLE;
+  // two or three clusters, as many as the open area has room for
+  const k = Math.min(3, Math.max(2, Math.round(((area[1] - area[0]) * w) / 200)));
+  const here = centres(cycle, w, h, k, area);
+  const radius = Math.min(w, h) * (w < 700 ? 0.16 : 0.1);
+  const pull = (lag: number) => {
+    // drift 0–30%, gather 30–55%, hold 55–75%, dissolve 75–100%
+    const u = ph - lag;
+    return u < 0.3 ? 0 : u < 0.55 ? smooth((u - 0.3) / 0.25) : u < 0.75 ? 1 : 1 - smooth((u - 0.75) / 0.22);
+  };
+
+  const pos = pts.map((q, i) => {
+    const s = t * 0.00006 * q.sp;
+    const dx = (q.bx + q.ax * Math.sin(s + q.ph)) * w;
+    const dy = (q.by + q.ay * Math.cos(s * 0.8 + q.ph)) * h;
+    if (!q.joins) return { x: dx, y: dy };
+    // mixed clusters: neighbouring indices (all three kinds) share a centre
+    const c = here[Math.floor(i / 3) % k];
+    const swirl = t * 0.00004;
+    const cx = c.x + (q.ox * Math.cos(swirl) - q.oy * Math.sin(swirl)) * radius;
+    const cy = c.y + (q.ox * Math.sin(swirl) + q.oy * Math.cos(swirl)) * radius * 0.8;
+    const m = pull(q.lag);
+    return { x: dx + (cx - dx) * m, y: dy + (cy - dy) * m };
+  });
+
+  // faint lines to each point's nearest neighbours
+  const reach = Math.min(130, Math.max(80, w / 11));
+  ctx.lineWidth = 0.75;
+  ctx.strokeStyle = p.ink;
+  for (let i = 0; i < pos.length; i++) {
+    const near: [number, number][] = [];
+    for (let j = 0; j < pos.length; j++) {
+      if (i === j) continue;
+      const d = Math.hypot(pos[i].x - pos[j].x, pos[i].y - pos[j].y);
+      if (d > reach) continue;
+      near.push([d, j]);
+    }
+    near.sort((a, b) => a[0] - b[0]);
+    for (const [d, j] of near.slice(0, NEIGHBOURS)) {
+      ctx.globalAlpha = 0.16 * (1 - d / reach);
+      ctx.beginPath();
+      ctx.moveTo(pos[i].x, pos[i].y);
+      ctx.lineTo(pos[j].x, pos[j].y);
+      ctx.stroke();
+    }
+  }
+
+  // the points themselves
+  pts.forEach((q, i) => {
+    const { x, y } = pos[i];
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(q.rot);
+    ctx.lineWidth = 1;
+    if (q.kind === 0) {
+      // image patch
+      ctx.globalAlpha = 0.75;
+      ctx.strokeStyle = p.box;
+      ctx.strokeRect(-2, -2, 4, 4);
+    } else if (q.kind === 1) {
+      // time series / audio: a short wave segment
+      ctx.globalAlpha = 0.6;
+      ctx.strokeStyle = p.ink;
+      ctx.beginPath();
+      for (let u = -5; u <= 5; u += 1) {
+        const yy = Math.sin(u * 0.9 + q.ph) * 1.8;
+        if (u === -5) ctx.moveTo(u, yy);
+        else ctx.lineTo(u, yy);
+      }
+      ctx.stroke();
+    } else {
+      // text token
+      ctx.globalAlpha = 0.6;
+      ctx.strokeStyle = p.muted;
+      ctx.beginPath();
+      ctx.moveTo(-3.5, 0);
+      ctx.lineTo(3.5, 0);
+      ctx.stroke();
+    }
+    ctx.restore();
+  });
+  ctx.globalAlpha = 1;
+}
