@@ -90,7 +90,7 @@ export default function Home() {
             <div className={styles.heroText}>
               <p className={`${styles.lede} ${styles.enter}`} style={step(2)}>{profile.summary}</p>
               <p className={`${styles.credentials} ${styles.enter}`} style={step(3)}>
-                {profile.phd}. {profile.senate}. {profile.school}.
+                {profile.school}, {profile.university}. {profile.senate}. {profile.phd}.
               </p>
               <div className={`${styles.actions} ${styles.enter}`} style={step(4)}>
                 <a className={styles.primary} href={`mailto:${profile.email}`}>
@@ -239,6 +239,7 @@ export default function Home() {
                     </td>
                     <td className={styles.num} data-label="Value">
                       {gbp.format(g.amount)}
+                      {g.amountNote ? <span className={styles.amountNote}>{g.amountNote}</span> : null}
                       <span
                         className={styles.valueBar}
                         aria-hidden="true"
@@ -258,7 +259,7 @@ export default function Home() {
             <p className={styles.eyebrow}>Teaching</p>
             <h2 id="teaching-h">Modules I designed and lead</h2>
             <p className={styles.intro}>
-              I designed both modules on the MSc AI programme from scratch. Every lab is published as
+              I designed both of these MSc AI modules from scratch. Every lab is published as
               an open notebook repository so students, and anyone else, can work through it.
             </p>
           </div>

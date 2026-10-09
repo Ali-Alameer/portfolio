@@ -7,8 +7,8 @@ export const profile = {
   role: "Lecturer in Artificial Intelligence",
   school: "School of Science, Engineering & Environment",
   university: "University of Salford",
-  phd: "PhD in AI, Newcastle University",
-  senate: "Elected member of the University Senate",
+  phd: "PhD in AI from Newcastle University",
+  senate: "Elected member of the University of Salford Senate",
   email: "A.Alameer1@salford.ac.uk",
   summary:
     "I build multimodal machine learning methods that integrate high-dimensional visual, temporal and textual data, and put them to work in places that are hard on models: livestock barns, courtrooms, insurance claims and building surveys.",
@@ -94,11 +94,11 @@ export type Publication = {
 };
 
 export const publications: Publication[] = [
-  { title: "HADQEF: a hybrid AI framework for enhancing Arabic data quality and governance in alignment with Saudi Vision 2030", authors: "E Albaroudi, M Hatamleh, T Mansouri, A Alameer", venue: "Discover Artificial Intelligence", year: 2026, citations: 0, doi: "10.1007/s44163-026-01625-1", theme: "fairness" },
+  { title: "HADQEF: a hybrid AI framework for enhancing Arabic data quality and governance in alignment with Saudi Vision 2030", authors: "E Albaroudi, M Hatamleh, T Mansouri, A Alameer", venue: "Discover Artificial Intelligence 6(1)", year: 2026, citations: 0, doi: "10.1007/s44163-026-01625-1", theme: "fairness" },
   { title: "Understanding contest skill to reduce the welfare costs of aggression", authors: "LS Oldham, GA Arnott, M Briffa, A Futro, J Donbavand, AK Kadlecova, et al.", venue: "Biology Letters 22(4)", year: 2026, citations: 0, doi: "10.1098/rsbl.2025.0563", theme: "livestock" },
-  { title: "Addressing intersectional bias in AI recruitment using HITHIRE model: a fair, ethical, green AI and transparent hiring solution for Saudi Arabia's diverse workforce", authors: "E Albaroudi, T Mansouri, M Hatamleh, A Alameer", venue: "AI and Ethics 6(1)", year: 2026, citations: 5, doi: "10.1007/s43681-025-00844-z", theme: "fairness" },
-  { title: "COLLAB-LLM: a communication-centric role-based framework for scalable multi-agent LLM collaboration", authors: "E Albaroudi, M Hatamleh, MS Hejazi, AY Alshalabi, T Mansouri, et al.", venue: "Asian Journal of Research in Computer Science 19(1)", year: 2026, citations: 2, doi: "10.9734/ajrcos/2026/v19i1811", theme: "language" },
-  { title: "Vision transformer-based multi-camera multi-object tracking framework for dairy cow monitoring", authors: "K Abbas, Z Afzal, A Raza, T Mansouri, AW Dowsey, C Inchaisri, et al.", venue: "Smart Agricultural Technology", year: 2025, citations: 8, doi: "10.1016/j.atech.2025.101525", theme: "livestock", featured: true },
+  { title: "Addressing intersectional bias in AI recruitment using HITHIRE model: a fair, ethical, green AI and transparent hiring solution for Saudi Arabia's diverse workforce in line with Vision 2030", authors: "E Albaroudi, T Mansouri, M Hatamleh, A Alameer", venue: "AI and Ethics 6(1)", year: 2026, citations: 5, doi: "10.1007/s43681-025-00844-z", theme: "fairness" },
+  { title: "COLLAB-LLM: a communication-centric role-based framework for scalable multi-agent LLM collaboration", authors: "E Albaroudi, M Hatamleh, MS Hejazi, AY Alshalabi, T Mansouri, A Alameer", venue: "Asian Journal of Research in Computer Science 19(1)", year: 2026, citations: 2, doi: "10.9734/ajrcos/2026/v19i1811", theme: "language" },
+  { title: "Vision transformer-based multi-camera multi-object tracking framework for dairy cow monitoring", authors: "K Abbas, Z Afzal, A Raza, T Mansouri, AW Dowsey, C Inchaisri, A Alameer", venue: "Smart Agricultural Technology 12", year: 2025, citations: 8, doi: "10.1016/j.atech.2025.101525", theme: "livestock", featured: true },
   { title: "HitHire: the future of ethical, fair, and sustainable AI recruitment. A governance framework", authors: "E Albaroudi, T Mansouri, M Hatamleh, A Alameer", venue: "Array", year: 2025, citations: 9, doi: "10.1016/j.array.2025.100592", theme: "fairness" },
   { title: "Inclusive prompt engineering for large language models: a modular framework for ethical, structured, and adaptive AI", authors: "MS Torkestani, A Alameer, S Palaiahnakote, T Mansouri", venue: "Artificial Intelligence Review 58(11)", year: 2025, citations: 12, doi: "10.1007/s10462-025-11330-7", theme: "fairness", featured: true },
   { title: "A comparative analysis of state-of-the-art speech-to-text models for court applications", authors: "A Alameer, HK Jahromi, Z Afzal, M Malik, S Morphy, T Mansouri", venue: "Intl. Conference on Data Science, AI and Applications", year: 2025, citations: 1, doi: "10.1007/978-3-032-11355-9_32", theme: "language" },
@@ -133,6 +133,7 @@ export type Grant = {
   funder: string;
   partner?: string;
   amount: number; // GBP
+  amountNote?: string; // qualifies the amount, e.g. when it is only Salford's share
   kind: "Grant" | "KTP" | "Consultancy";
   status: "Ongoing" | "Completed";
 };
@@ -143,7 +144,7 @@ export const grants: Grant[] = [
   { title: "Vision and NLP for text and image query management", funder: "Innovate UK", partner: "TSK Group", amount: 293603, kind: "KTP", status: "Ongoing" },
   { title: "Sustainable dairy farming via machine vision", funder: "British Council / ISPF", amount: 79942, kind: "Grant", status: "Ongoing" },
   { title: "AI fairness, bias and digital sustainability", funder: "Research grant", amount: 135619, kind: "Grant", status: "Completed" },
-  { title: "ELI: Expert Legal Intelligence", funder: "Research grant", partner: "Salford share", amount: 78514, kind: "Grant", status: "Completed" },
+  { title: "ELI: Expert Legal Intelligence", funder: "Research grant", amount: 78514, amountNote: "Salford share", kind: "Grant", status: "Completed" },
   { title: "Ethical AI auditing tool validation", funder: "Research grant", amount: 2500, kind: "Grant", status: "Completed" },
   { title: "ASR bias and fairness evaluation for legal deployment", funder: "Industry", amount: 37728, kind: "Consultancy", status: "Completed" },
   { title: "Personalised AI recommendation engine", funder: "World Privilege Ltd", amount: 19743, kind: "Consultancy", status: "Completed" },
