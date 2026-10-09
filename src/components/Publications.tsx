@@ -18,6 +18,39 @@ function Authors({ text }: { text: string }) {
   );
 }
 
+export function SelectedPublications({ count = 5 }: { count?: number }) {
+  const rows = [...publications].sort((a, b) => b.citations - a.citations).slice(0, count);
+
+  return (
+    <ol className={styles.list}>
+      {rows.map((p) => (
+        <li key={p.title} className={styles.row}>
+          <span className={styles.year}>{p.year}</span>
+          <div className={styles.main}>
+            <h3 className={styles.title}>
+              <a
+                href={`https://scholar.google.com/scholar?q=${encodeURIComponent(`"${p.title}"`)}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {p.title}
+              </a>
+            </h3>
+            <p className={styles.authors}>
+              <Authors text={p.authors} />
+            </p>
+            <p className={styles.venue}>{p.venue}</p>
+          </div>
+          <span className={styles.cites} title="Google Scholar citations">
+            {nf.format(p.citations)}
+            <span className={styles.citesLabel}>cited</span>
+          </span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
 export default function Publications() {
   const [filter, setFilter] = useState<Filter>("all");
   const [sort, setSort] = useState<Sort>("year");

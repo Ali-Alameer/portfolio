@@ -1,5 +1,5 @@
 import CitationChart from "@/components/CitationChart";
-import Publications from "@/components/Publications";
+import Publications, { SelectedPublications } from "@/components/Publications";
 import ThemeToggle from "@/components/ThemeToggle";
 import {
   datasets,
@@ -109,6 +109,19 @@ export default function Home() {
               <CitationChart />
             </aside>
           </div>
+        </section>
+
+        {/* Selected publications ---------------------------------- */}
+        <section id="selected" className={styles.section} aria-labelledby="selected-h">
+          <div className={styles.sectionHead}>
+            <p className={styles.eyebrow}>Selected publications</p>
+            <h2 id="selected-h">Five most cited papers</h2>
+            <p className={styles.intro}>
+              Ranked by Google Scholar citations ({scholarStats.asOf}). The full list is in{" "}
+              <a href="#publications">Publications</a> below.
+            </p>
+          </div>
+          <SelectedPublications />
         </section>
 
         {/* Research --------------------------------------------------- */}
