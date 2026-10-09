@@ -31,7 +31,12 @@ export type Frame = {
 // the moment a still frame shows: late enough for draw-in effects to finish
 const STILL_T = 6000;
 
-export function useCanvas(ref: RefObject<HTMLCanvasElement | null>, draw: (f: Frame) => void) {
+export function useCanvas(
+  ref: RefObject<HTMLCanvasElement | null>,
+  draw: (f: Frame) => void,
+  /** moment shown as the still frame under reduced motion */
+  stillT = STILL_T,
+) {
   const drawRef = useRef(draw);
   useEffect(() => {
     drawRef.current = draw;
@@ -54,7 +59,7 @@ export function useCanvas(ref: RefObject<HTMLCanvasElement | null>, draw: (f: Fr
     let pausedAt = 0;
 
     const frame = (now: number) => {
-      const t = still ? STILL_T : now - started - paused;
+      const t = still ? stillT : now - started - paused;
       ctx.clearRect(0, 0, w, h);
       drawRef.current({ ctx, w, h, t, p, still });
       if (!still && onScreen && !document.hidden) raf = requestAnimationFrame(frame);
@@ -122,7 +127,7 @@ export function useCanvas(ref: RefObject<HTMLCanvasElement | null>, draw: (f: Fr
       window.removeEventListener("themechange", retheme);
       scheme.removeEventListener("change", retheme);
     };
-  }, [ref]);
+  }, [ref, stillT]);
 }
 
 function readPalette(el: Element): Palette {

@@ -8,6 +8,7 @@ import LossCurve from "@/components/viz/LossCurve";
 import SignalTrace from "@/components/viz/SignalTrace";
 import StrandVisual from "@/components/viz/StrandVisual";
 import EmbeddingBackdrop from "@/components/EmbeddingBackdrop";
+import EncoderBackdrop from "@/components/EncoderBackdrop";
 import Publications, { SelectedPublications } from "@/components/Publications";
 import Interactions from "@/components/Interactions";
 import Reveal from "@/components/Reveal";
@@ -88,10 +89,8 @@ export default function Home() {
       <main id="main">
         {/* Hero ------------------------------------------------------- */}
         <section className={styles.hero} aria-labelledby="hero-name">
-          {/* the model's story runs left to right through the open space
-              above the citation panel; its outputs join clusters at the
-              right edge */}
-          <EmbeddingBackdrop area={[0.88, 0.99, 0.1, 0.42]} story />
+          {/* a transformer encoder running a forward pass, upper right */}
+          <EncoderBackdrop />
           <p className={`${styles.eyebrow} ${styles.enter}`} style={step(0)}>
             {profile.role} · {profile.university}
           </p>
