@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import CitationChart from "@/components/CitationChart";
 import CountUp from "@/components/CountUp";
+import HeroBackdrop from "@/components/HeroBackdrop";
 import Publications, { SelectedPublications } from "@/components/Publications";
 import Reveal from "@/components/Reveal";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -39,6 +40,7 @@ export default function Home() {
   const totalFunding = grants.reduce((s, g) => s + g.amount, 0);
   const ongoing = grants.filter((g) => g.status === "Ongoing");
   const ongoingTotal = ongoing.reduce((s, g) => s + g.amount, 0);
+  const largestGrant = Math.max(...grants.map((g) => g.amount));
 
   return (
     <div className={styles.page}>
@@ -65,6 +67,7 @@ export default function Home() {
       <main id="main">
         {/* Hero ------------------------------------------------------- */}
         <section className={styles.hero} aria-labelledby="hero-name">
+          <HeroBackdrop />
           <p className={`${styles.eyebrow} ${styles.enter}`} style={step(0)}>
             {profile.role} · {profile.university}
           </p>
@@ -180,6 +183,17 @@ export default function Home() {
             </p>
           </div>
           <div className={styles.tableWrap} data-reveal>
+            {/* each award as a share of the total; the table below carries the figures */}
+            <div className={styles.fundingBar} aria-hidden="true">
+              {grants.map((g, i) => (
+                <span
+                  key={g.title}
+                  data-status={g.status}
+                  title={`${g.title}: ${gbp.format(g.amount)}`}
+                  style={{ ...step(i), flexGrow: g.amount }}
+                />
+              ))}
+            </div>
             <table className={styles.table}>
               <thead>
                 <tr>
@@ -196,17 +210,26 @@ export default function Home() {
                 {grants.map((g, i) => (
                   <tr key={g.title} style={step(i)}>
                     <th scope="row">{g.title}</th>
-                    <td>
+                    <td data-label="Funder / partner">
                       {g.funder}
                       {g.partner ? <span className={styles.partner}> · {g.partner}</span> : null}
                     </td>
-                    <td className={styles.kind}>{g.kind}</td>
-                    <td>
+                    <td className={styles.kind} data-label="Type">
+                      <span>{g.kind}</span>
+                    </td>
+                    <td data-label="Status">
                       <span className={styles.status} data-status={g.status}>
                         {g.status}
                       </span>
                     </td>
-                    <td className={styles.num}>{gbp.format(g.amount)}</td>
+                    <td className={styles.num} data-label="Value">
+                      {gbp.format(g.amount)}
+                      <span
+                        className={styles.valueBar}
+                        aria-hidden="true"
+                        style={{ "--share": g.amount / largestGrant } as CSSProperties}
+                      />
+                    </td>
                   </tr>
                 ))}
               </tbody>

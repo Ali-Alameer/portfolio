@@ -22,29 +22,31 @@ export function SelectedPublications({ count = 5 }: { count?: number }) {
   const rows = [...publications].sort((a, b) => b.citations - a.citations).slice(0, count);
 
   return (
-    <ol className={styles.list}>
-      {rows.map((p) => (
-        <li key={p.title} className={styles.row}>
-          <span className={styles.year}>{p.year}</span>
-          <div className={styles.main}>
-            <h3 className={styles.title}>
-              <a
-                href={`https://scholar.google.com/scholar?q=${encodeURIComponent(`"${p.title}"`)}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {p.title}
-              </a>
-            </h3>
-            <p className={styles.authors}>
-              <Authors text={p.authors} />
-            </p>
-            <p className={styles.venue}>{p.venue}</p>
+    <ol className={styles.cards}>
+      {rows.map((p, i) => (
+        <li key={p.title} className={styles.card} style={{ "--i": i } as CSSProperties}>
+          <div className={styles.cardTop}>
+            <span className={styles.year}>{p.year}</span>
+            <span className={styles.cardCites} title="Google Scholar citations">
+              {nf.format(p.citations)}
+              <span className={styles.citesLabel}>cited</span>
+            </span>
           </div>
-          <span className={styles.cites} title="Google Scholar citations">
-            {nf.format(p.citations)}
-            <span className={styles.citesLabel}>cited</span>
-          </span>
+          <h3 className={styles.cardTitle}>
+            {/* the link covers the whole card; see .cardTitle a::after */}
+            <a
+              href={`https://scholar.google.com/scholar?q=${encodeURIComponent(`"${p.title}"`)}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {p.title}
+            </a>
+          </h3>
+          <p className={styles.authors}>
+            <Authors text={p.authors} />
+          </p>
+          <p className={styles.venue}>{p.venue}</p>
+          <span className={styles.corners} aria-hidden="true" />
         </li>
       ))}
     </ol>

@@ -1,0 +1,35 @@
+/* Fills the hero behind its content: a dark field with two soft colour
+   glows, the canvas network on top, and a shade that keeps the text column
+   darkest. */
+.backdrop {
+  --net-accent: #a3a6ff;
+  --net-line: 214, 222, 217;
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 70% 90% at 85% 20%, rgb(58 62 220 / 0.22), transparent 70%),
+    radial-gradient(ellipse 60% 70% at 10% 100%, rgb(29 122 75 / 0.14), transparent 70%),
+    #0b0f0d;
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgb(11 15 13 / 0.7) 0%, rgb(11 15 13 / 0.25) 55%, transparent 100%);
+}
+
+@media (max-width: 52rem) {
+  .shade {
+    background: rgb(11 15 13 / 0.4);
+  }
+}

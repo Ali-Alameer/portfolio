@@ -142,10 +142,35 @@
   }
 }
 
+/* The hero is a full-bleed dark band over an animated network backdrop
+   (components/HeroBackdrop). It always uses the dark palette, whatever the
+   page theme, so text stays legible over the backdrop. */
 .hero {
+  --ink: #eef1ee;
+  --muted: #b3bcb6;
+  --line: rgb(255 255 255 / 0.16);
+  --box: #a3a6ff;
+  --box-ink: #0d100f;
+  --surface: rgb(13 17 15 / 0.55);
+  color-scheme: dark;
+
+  position: relative;
+  isolation: isolate;
   display: grid;
   gap: clamp(1.5rem, 4vw, 2.5rem);
-  padding-block: clamp(3rem, 8vw, 6rem) 0;
+  color: var(--ink);
+  margin-inline: calc(50% - 50vw);
+  padding-inline: calc(50vw - 50%);
+  padding-block: clamp(3.5rem, 9vw, 7rem) clamp(3.5rem, 8vw, 6rem);
+}
+
+.hero .metrics {
+  backdrop-filter: blur(10px) saturate(1.1);
+  -webkit-backdrop-filter: blur(10px) saturate(1.1);
+}
+
+.hero .secondary {
+  background: rgb(13 17 15 / 0.35);
 }
 
 .name {
@@ -450,22 +475,56 @@
 
 /* Funding table ----------------------------------------------------- */
 .tableWrap {
-  overflow-x: auto;
-  border-top: 1px solid var(--ink);
+  display: grid;
+  gap: 1.5rem;
+}
+
+/* one segment per award, sized by value: green for ongoing */
+.fundingBar {
+  display: flex;
+  gap: 3px;
+  height: 0.75rem;
+}
+
+.fundingBar span {
+  flex-basis: 0;
+  min-width: 3px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--muted) 45%, transparent);
+  transform-origin: left;
+  transition: filter 0.2s;
+}
+
+.fundingBar span[data-status="Ongoing"] {
+  background: var(--live);
+}
+
+.fundingBar span:hover {
+  filter: brightness(1.25);
+}
+
+[data-shown] .fundingBar span {
+  animation: grow-x 0.9s var(--ease) calc(150ms + var(--i, 0) * 60ms) both;
+}
+
+@keyframes grow-x {
+  from {
+    transform: scaleX(0);
+  }
 }
 
 .table {
   width: 100%;
-  min-width: 44rem;
   border-collapse: collapse;
   font-size: 0.9375rem;
+  border-top: 1px solid var(--ink);
 }
 
 .table th,
 .table td {
   text-align: left;
-  vertical-align: baseline;
-  padding: 0.85rem 1rem 0.85rem 0;
+  vertical-align: middle;
+  padding: 1rem 1rem 1rem 0;
   border-bottom: 1px solid var(--line);
 }
 
@@ -478,6 +537,7 @@
 
 .table tbody th {
   font-weight: 600;
+  font-size: var(--step-0);
 }
 
 .table tbody tr {
@@ -496,13 +556,32 @@
   white-space: nowrap;
 }
 
+/* a thin bar under each value, relative to the largest award */
+.valueBar {
+  display: block;
+  height: 3px;
+  margin-top: 0.4rem;
+  margin-left: auto;
+  width: calc(var(--share) * 100%);
+  min-width: 4px;
+  max-width: 7rem;
+  border-radius: 2px;
+  background: var(--box);
+  opacity: 0.55;
+}
+
 .partner {
   color: var(--muted);
 }
 
-.kind {
-  font: var(--step--1) / 1.4 var(--font-m);
+.kind span {
+  display: inline-block;
+  font: 500 0.75rem / 1 var(--font-m);
   color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.3rem 0.6rem;
+  white-space: nowrap;
 }
 
 .status {
@@ -512,6 +591,9 @@
   font: 500 0.75rem / 1 var(--font-m);
   color: var(--muted);
   white-space: nowrap;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--muted) 10%, transparent);
 }
 
 .status::before {
@@ -524,10 +606,85 @@
 
 .status[data-status="Ongoing"] {
   color: var(--live);
+  background: color-mix(in srgb, var(--live) 12%, transparent);
 }
 
 .status[data-status="Ongoing"]::before {
   background: currentColor;
+}
+
+/* On narrow screens each row becomes a card; cell labels come from
+   data-label so nothing the column headers said is lost. */
+@media (max-width: 44rem) {
+  .table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .table,
+  .table tbody,
+  .table tr,
+  .table th,
+  .table td {
+    display: block;
+  }
+
+  .table {
+    border-top: 0;
+  }
+
+  .table tbody {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .table tbody tr {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.6rem 1rem;
+    padding: 1.1rem 1.2rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+
+  .table th,
+  .table td {
+    padding: 0;
+    border: 0;
+  }
+
+  .table tbody th {
+    grid-column: 1 / -1;
+  }
+
+  .table td[data-label="Funder / partner"] {
+    grid-column: 1 / -1;
+    color: var(--ink);
+  }
+
+  .table td[data-label="Funder / partner"]::before,
+  .table td[data-label="Value"]::before {
+    content: attr(data-label);
+    display: block;
+    font: 500 0.6875rem / 1.4 var(--font-m);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .table .num {
+    grid-column: 1 / -1;
+    text-align: left;
+    font-size: var(--step-1);
+  }
+
+  .valueBar {
+    margin-left: 0;
+  }
 }
 
 /* Teaching ---------------------------------------------------------- */
