@@ -6,7 +6,6 @@ import Publications, { SelectedPublications } from "@/components/Publications";
 import Reveal from "@/components/Reveal";
 import ThemeToggle from "@/components/ThemeToggle";
 import {
-  datasets,
   grants,
   modules,
   profile,
@@ -344,26 +343,12 @@ export default function Home() {
             <h2 id="pubs-h">Papers, 2015 to {Math.max(...publications.map((p) => p.year))}</h2>
             <p className={styles.intro}>
               Journal articles, conference papers and my PhD thesis. Citation counts are from Google
-              Scholar ({scholarStats.asOf}). Titles link to the paper, or to a Scholar search where there is no DOI.
+              Scholar ({scholarStats.asOf}). Titles link to the paper, or to a Scholar search where
+              there is no DOI.
             </p>
           </div>
           <div data-reveal>
             <Publications />
-          </div>
-
-          <div className={styles.datasets} data-reveal>
-            <h3>Open datasets</h3>
-            <ul data-stagger>
-              {datasets.map((d) => (
-                <li key={d.title}>
-                  <span className={styles.dsYear}>{d.year}</span>
-                  <span>
-                    {d.title}
-                    {d.with ? <span className={styles.dsWith}> with {d.with}</span> : null}
-                  </span>
-                </li>
-              ))}
-            </ul>
           </div>
         </section>
 

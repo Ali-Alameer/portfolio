@@ -128,13 +128,6 @@ export const publications: Publication[] = [
   { title: "An elastic net-regularized HMAX model of visual processing", authors: "A Alameer, G Ghazaei, P Degenaar, K Nazarpour", venue: "Intelligent Signal Processing Conference", year: 2015, citations: 11, doi: "10.1049/cp.2015.1753", theme: "vision" },
 ];
 
-export const datasets = [
-  { title: "Hand Recognition Dataset for Machine Vision Researchers (YOLOv8 format)", year: 2023 },
-  { title: "Facial Emotion Detection Dataset", year: 2023 },
-  { title: "Facial Expression Image Dataset for Computer Vision Algorithms", year: 2022, with: "O Osonuga" },
-  { title: "UoS Buildings Image Dataset for Computer Vision Algorithms", year: 2022, with: "M Al-Mosawy" },
-];
-
 export type Grant = {
   title: string;
   funder: string;
