@@ -83,6 +83,12 @@
   color: var(--muted);
 }
 
+.note {
+  margin: 0;
+  font: 0.75rem / 1.4 var(--font-m);
+  color: var(--muted);
+}
+
 @keyframes fade {
   from {
     opacity: 0;

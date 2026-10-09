@@ -259,8 +259,9 @@ export default function Home() {
             <p className={styles.eyebrow}>Teaching</p>
             <h2 id="teaching-h">Modules I designed and lead</h2>
             <p className={styles.intro}>
-              I designed both of these MSc AI modules from scratch. Every lab is published as
-              an open notebook repository so students, and anyone else, can work through it.
+              I designed both of these modules from scratch for the MSc AI programme at the
+              University of Salford. Every lab is published as an open notebook repository so
+              students, and anyone else, can work through it.
             </p>
           </div>
 
@@ -296,6 +297,9 @@ export default function Home() {
             ))}
           </ul>
 
+          <p className={styles.peopleNote} data-reveal>
+            All research students listed are supervised at the University of Salford.
+          </p>
           <div className={styles.people} data-reveal>
             <div>
               <h3>Current research students</h3>

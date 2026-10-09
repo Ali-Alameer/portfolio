@@ -63,7 +63,7 @@ export const themes: {
     id: "language",
     label: "Vision + language",
     title: "Multimodal AI for industry",
-    body: "Vision-language and speech models built with industrial partners through Knowledge Transfer Partnerships: digital building surveys, motor insurance claims, document query management and court transcription.",
+    body: "Vision-language and speech models built with industrial partners. Knowledge Transfer Partnerships cover digital building surveys, motor insurance claims and document query management; court transcription work came through a research grant (ELI) and consultancy.",
     tag: "survey · damp_mould  0.88",
   },
   {
@@ -77,7 +77,7 @@ export const themes: {
     id: "vision",
     label: "Foundations",
     title: "Biologically inspired vision",
-    body: "My PhD work at Newcastle: hierarchical models of the visual cortex (EN-HMAX), context-based object recognition, and early deep learning for grasp classification in prosthetic hands.",
+    body: "Work that began with my PhD at Newcastle and has continued since: hierarchical models of the visual cortex (EN-HMAX), context-based object recognition, early deep learning for grasp classification in prosthetic hands, handwriting recognition and biomedical signal processing.",
     tag: "v1 · s1_c1_pool  0.82",
   },
 ];
@@ -99,7 +99,7 @@ export const publications: Publication[] = [
   { title: "Addressing intersectional bias in AI recruitment using HITHIRE model: a fair, ethical, green AI and transparent hiring solution for Saudi Arabia's diverse workforce in line with Vision 2030", authors: "E Albaroudi, T Mansouri, M Hatamleh, A Alameer", venue: "AI and Ethics 6(1)", year: 2026, citations: 5, doi: "10.1007/s43681-025-00844-z", theme: "fairness" },
   { title: "COLLAB-LLM: a communication-centric role-based framework for scalable multi-agent LLM collaboration", authors: "E Albaroudi, M Hatamleh, MS Hejazi, AY Alshalabi, T Mansouri, A Alameer", venue: "Asian Journal of Research in Computer Science 19(1)", year: 2026, citations: 2, doi: "10.9734/ajrcos/2026/v19i1811", theme: "language" },
   { title: "Vision transformer-based multi-camera multi-object tracking framework for dairy cow monitoring", authors: "K Abbas, Z Afzal, A Raza, T Mansouri, AW Dowsey, C Inchaisri, A Alameer", venue: "Smart Agricultural Technology 12", year: 2025, citations: 8, doi: "10.1016/j.atech.2025.101525", theme: "livestock", featured: true },
-  { title: "HitHire: the future of ethical, fair, and sustainable AI recruitment. A governance framework", authors: "E Albaroudi, T Mansouri, M Hatamleh, A Alameer", venue: "Array", year: 2025, citations: 9, doi: "10.1016/j.array.2025.100592", theme: "fairness" },
+  { title: "HitHire: the future of ethical, fair, and sustainable AI recruitment. A governance framework", authors: "E Albaroudi, T Mansouri, M Hatamleh, A Alameer", venue: "Array 29", year: 2026, citations: 9, doi: "10.1016/j.array.2025.100592", theme: "fairness" },
   { title: "Inclusive prompt engineering for large language models: a modular framework for ethical, structured, and adaptive AI", authors: "MS Torkestani, A Alameer, S Palaiahnakote, T Mansouri", venue: "Artificial Intelligence Review 58(11)", year: 2025, citations: 12, doi: "10.1007/s10462-025-11330-7", theme: "fairness", featured: true },
   { title: "A comparative analysis of state-of-the-art speech-to-text models for court applications", authors: "A Alameer, HK Jahromi, Z Afzal, M Malik, S Morphy, T Mansouri", venue: "Intl. Conference on Data Science, AI and Applications", year: 2025, citations: 1, doi: "10.1007/978-3-032-11355-9_32", theme: "language" },
   { title: "Vision transformers for automated detection of pig interactions in groups", authors: "G Taiwo, S Vadera, A Alameer", venue: "Smart Agricultural Technology 10", year: 2025, citations: 55, doi: "10.1016/j.atech.2025.100774", theme: "livestock", featured: true },
@@ -107,7 +107,7 @@ export const publications: Publication[] = [
   { title: "Generative AI and the future of software engineering in Saudi Arabia: governance, innovation, and workforce transformation", authors: "E Albaroudi, T Mansouri, M Hatamleh, M Elbehairy, A Alameer", venue: "Intl. Journal of Theoretical & Applied Computational Intelligence", year: 2025, citations: 16, doi: "10.65278/ijtaci.2025.4", theme: "fairness" },
   { title: "Saudi Arabia's Vision 2030: leveraging generative artificial intelligence to enhance software engineering", authors: "E Albaroudi, T Mansouri, M Hatamleh, A Alameer", venue: "8th Intl. Women in Data Science Conference, Prince Sultan University", year: 2025, citations: 15, doi: "10.1109/wids-psu64963.2025.00024", theme: "fairness" },
   { title: "RLS adaptive filter co-design for de-noising ECG signal", authors: "AF Mahmood, SN Awny, A Alameer", venue: "Results in Engineering 24", year: 2024, citations: 15, doi: "10.1016/j.rineng.2024.103563", theme: "vision" },
-  { title: "Review of farmer-centered AI systems technologies in livestock operations", authors: "GA Taiwo, A Alameer, T Mansouri", venue: "CABI Reviews 19(1)", year: 2024, citations: 11, doi: "10.1079/cabireviews.2024.0038", theme: "livestock" },
+  { title: "Review of farmer-centered AI systems technologies in livestock operations", authors: "GA Taiwo, A Alameer, T Mansouri", venue: "CABI Reviews", year: 2024, citations: 11, doi: "10.1079/cabireviews.2024.0038", theme: "livestock" },
   { title: "The intersection of generative AI and healthcare: addressing challenges to enhance patient care", authors: "E Albaroudi, T Mansouri, A Alameer", venue: "7th Intl. Women in Data Science Conference, Prince Sultan University", year: 2024, citations: 29, doi: "10.1109/wids-psu61003.2024.00039", theme: "fairness" },
   { title: "A comprehensive review of AI techniques for addressing algorithmic bias in job hiring", authors: "E Albaroudi, T Mansouri, A Alameer", venue: "AI 5(1), 383–404", year: 2024, citations: 283, doi: "10.3390/ai5010019", theme: "fairness", featured: true },
   { title: "Toward the automated detection of behavioral changes associated with the post-weaning transition in pigs", authors: "I Kyriazakis, A Alameer, K Bučková, R Muns", venue: "Frontiers in Veterinary Science 9", year: 2023, citations: 11, doi: "10.3389/fvets.2022.1087570", theme: "livestock" },
@@ -188,7 +188,7 @@ export const supervision = {
   ],
   ktpAssociates: [
     { name: "Zeeshan Afzal", topic: "Vision-language model digital surveying tool" },
-    { name: "Mohamed Maharoof", topic: "LLM and vision models for indexing and cross-referencing" },
+    { name: "Mohamed Maharoof", topic: "LLM and vision models for indexing and cross-referencing, TSK Group KTP" },
     { name: "AJ Shoaib", topic: "Computer vision and NLP for motor insurance" },
   ],
 };
