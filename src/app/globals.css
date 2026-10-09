@@ -245,6 +245,13 @@ img {
   initial-value: 0;
 }
 
+/* ...and nudge up a little on hover through this one. */
+@property --nudge {
+  syntax: "<integer>";
+  inherits: false;
+  initial-value: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

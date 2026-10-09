@@ -25,6 +25,15 @@ function Authors({ text }: { text: string }) {
   );
 }
 
+// Tells the section's citation network which paper is being pointed at, so
+// its node and links can light up (CitationNetwork reads data-focus).
+function focusNode(el: HTMLElement, i: number | null) {
+  const section = el.closest<HTMLElement>("section");
+  if (!section) return;
+  if (i === null) delete section.dataset.focus;
+  else section.dataset.focus = String(i);
+}
+
 export function SelectedPublications({ count = 5 }: { count?: number }) {
   const rows = [...publications].sort((a, b) => b.citations - a.citations).slice(0, count);
   const most = rows[0]?.citations || 1;
@@ -32,7 +41,15 @@ export function SelectedPublications({ count = 5 }: { count?: number }) {
   return (
     <ol className={styles.cards}>
       {rows.map((p, i) => (
-        <li key={p.title} className={styles.card} style={{ "--i": i } as CSSProperties}>
+        <li
+          key={p.title}
+          className={styles.card}
+          style={{ "--i": i } as CSSProperties}
+          onPointerEnter={(e) => focusNode(e.currentTarget, i)}
+          onPointerLeave={(e) => focusNode(e.currentTarget, null)}
+          onFocus={(e) => focusNode(e.currentTarget, i)}
+          onBlur={(e) => focusNode(e.currentTarget, null)}
+        >
           <div className={styles.cardTop}>
             <span className={styles.year}>{p.year}</span>
             <span className={styles.cardCites} title="Google Scholar citations">
@@ -127,6 +144,25 @@ export default function Publications() {
     update();
   };
 
+  // Changing the filter first blurs and fades the papers that are about to
+  // leave, then rearranges the list.
+  const pending = useRef(0);
+  const pickFilter = (next: Filter) => {
+    window.clearTimeout(pending.current);
+    const leaving = [...(listRef.current?.querySelectorAll<HTMLElement>("[data-key]") ?? [])].filter(
+      (el) => next !== "all" && el.dataset.theme !== next,
+    );
+    if (!leaving.length || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      change(() => setFilter(next));
+      return;
+    }
+    leaving.forEach((el) => el.setAttribute("data-leaving", ""));
+    pending.current = window.setTimeout(() => {
+      leaving.forEach((el) => el.removeAttribute("data-leaving"));
+      change(() => setFilter(next));
+    }, 260);
+  };
+
   const options: { id: Filter; label: string }[] = [
     { id: "all", label: "All" },
     ...themes.map((t) => ({ id: t.id, label: t.label })),
@@ -143,7 +179,7 @@ export default function Publications() {
               type="button"
               className={styles.chip}
               aria-pressed={filter === o.id}
-              onClick={() => change(() => setFilter(o.id))}
+              onClick={() => pickFilter(o.id)}
             >
               {o.label}
               <span className={styles.count}>{counts[o.id] ?? 0}</span>
@@ -163,16 +199,26 @@ export default function Publications() {
       </div>
 
       {/* a timeline runs down the left edge with a dot where each new year
-          starts; rows fade in on scroll ([data-stagger]) where supported */}
-      <ol ref={listRef} className={`${styles.list} ${styles.animated} ${styles.timeline}`} data-stagger>
+          starts; pointing at a dot highlights that year's papers. Rows fade
+          in on scroll ([data-stagger]) where supported */}
+      <ol
+        ref={listRef}
+        className={`${styles.list} ${styles.animated} ${styles.timeline}`}
+        data-stagger
+        data-link-scope
+      >
         {rows.map((p, i) => (
           <li
             key={p.title}
             data-key={p.title}
-            data-newyear={i === 0 || rows[i - 1].year !== p.year || undefined}
+            data-theme={p.theme}
+            data-link={`y${p.year}`}
             className={styles.row}
             style={{ "--i": Math.min(i, 12) } as CSSProperties}
           >
+            {(i === 0 || rows[i - 1].year !== p.year) && (
+              <span className={styles.dot} data-link={`y${p.year}`} data-link-trigger aria-hidden="true" />
+            )}
             <span className={styles.year}>{p.year}</span>
             <div className={styles.main}>
               <h3 className={styles.title}>

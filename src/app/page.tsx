@@ -3,9 +3,12 @@ import CitationChart from "@/components/CitationChart";
 import CountUp from "@/components/CountUp";
 import CitationNetwork from "@/components/viz/CitationNetwork";
 import ForwardPass from "@/components/viz/ForwardPass";
+import LossCurve from "@/components/viz/LossCurve";
+import SignalTrace from "@/components/viz/SignalTrace";
 import StrandVisual from "@/components/viz/StrandVisual";
 import NetworkBackdrop from "@/components/NetworkBackdrop";
 import Publications, { SelectedPublications } from "@/components/Publications";
+import Interactions from "@/components/Interactions";
 import Reveal from "@/components/Reveal";
 import ThemeToggle from "@/components/ThemeToggle";
 import {
@@ -144,7 +147,9 @@ export default function Home() {
         </section>
 
         {/* Selected publications ---------------------------------- */}
-        <section id="selected" className={styles.section} aria-labelledby="selected-h">
+        <section id="selected" className={styles.section} aria-labelledby="selected-h" data-spot>
+          <span className={styles.spot} aria-hidden="true" />
+          <SignalTrace seed={3} />
           <CitationNetwork weights={topCitations} />
           <div className={styles.sectionHead} data-scan>
             <p className={styles.eyebrow}>Selected publications</p>
@@ -161,6 +166,8 @@ export default function Home() {
 
         {/* Research --------------------------------------------------- */}
         <section id="research" className={`${styles.section} ${styles.tinted}`} aria-labelledby="research-h">
+          {/* no attention spotlight here: the strand figures are motion enough */}
+          <SignalTrace seed={8} />
           <div className={styles.sectionHead} data-scan>
             <p className={styles.eyebrow}>Research</p>
             <h2 id="research-h">AI that has to work outside the lab</h2>
@@ -200,7 +207,9 @@ export default function Home() {
         </section>
 
         {/* Funding ---------------------------------------------------- */}
-        <section id="funding" className={styles.section} aria-labelledby="funding-h">
+        <section id="funding" className={styles.section} aria-labelledby="funding-h" data-spot>
+          <span className={styles.spot} aria-hidden="true" />
+          <SignalTrace seed={13} />
           <div className={styles.sectionHead} data-scan>
             <p className={styles.eyebrow}>Funding</p>
             <h2 id="funding-h">Grants, KTPs and consultancy</h2>
@@ -211,12 +220,15 @@ export default function Home() {
               company.
             </p>
           </div>
-          <div className={styles.tableWrap} data-scan>
+          {/* rows and bar segments highlight each other (components/Interactions) */}
+          <div className={styles.tableWrap} data-scan data-link-scope>
             {/* each award as a share of the total; the table below carries the figures */}
             <div className={styles.fundingBar} aria-hidden="true">
               {grants.map((g, i) => (
                 <span
                   key={g.title}
+                  data-link={`g${i}`}
+                  data-link-trigger
                   data-status={g.status}
                   title={`${g.title}: ${gbp.format(g.amount)}`}
                   style={{ ...step(i), flexGrow: g.amount }}
@@ -243,7 +255,7 @@ export default function Home() {
               </thead>
               <tbody>
                 {grants.map((g, i) => (
-                  <tr key={g.title} style={step(i)}>
+                  <tr key={g.title} style={step(i)} data-link={`g${i}`} data-link-trigger>
                     <th scope="row">{g.title}</th>
                     <td data-label="Funder / partner">
                       {g.funder}
@@ -274,7 +286,14 @@ export default function Home() {
         </section>
 
         {/* Teaching & supervision ------------------------------------- */}
-        <section id="teaching" className={`${styles.section} ${styles.tinted}`} aria-labelledby="teaching-h">
+        <section
+          id="teaching"
+          className={`${styles.section} ${styles.tinted}`}
+          aria-labelledby="teaching-h"
+          data-spot
+        >
+          <span className={styles.spot} aria-hidden="true" />
+          <SignalTrace seed={21} />
           <ForwardPass />
           <div className={styles.sectionHead} data-scan>
             <p className={styles.eyebrow}>Teaching</p>
@@ -363,7 +382,9 @@ export default function Home() {
         </section>
 
         {/* Publications ----------------------------------------------- */}
-        <section id="publications" className={styles.section} aria-labelledby="pubs-h">
+        <section id="publications" className={styles.section} aria-labelledby="pubs-h" data-spot>
+          <span className={styles.spot} aria-hidden="true" />
+          <SignalTrace seed={34} />
           <div className={styles.sectionHead} data-scan>
             <p className={styles.eyebrow}>Publications</p>
             <h2 id="pubs-h">Papers, 2015 to {Math.max(...publications.map((p) => p.year))}</h2>
@@ -423,6 +444,8 @@ export default function Home() {
         <span>{profile.school}, {profile.university}, Salford, UK</span>
       </footer>
       <Reveal />
+      <Interactions />
+      <LossCurve />
     </div>
   );
 }

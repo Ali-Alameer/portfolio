@@ -119,6 +119,7 @@
   bottom: 0;
   width: 1px;
   background: var(--line);
+  pointer-events: none;
 }
 
 .timeline::after {
@@ -127,16 +128,42 @@
   transform-origin: top;
 }
 
-.timeline .row[data-newyear]::after {
-  content: "";
+.dot {
   position: absolute;
-  left: calc(-1.75rem + 0.45rem - 3.5px);
+  left: calc(-1.75rem + 0.45rem - 4px);
   top: 1.45rem;
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   border: 1.5px solid var(--box);
   background: var(--paper);
+  transition:
+    background-color 0.2s,
+    transform 0.25s var(--ease);
+}
+
+/* a larger invisible target than the dot itself */
+.dot::before {
+  content: "";
+  position: absolute;
+  inset: -9px;
+  border-radius: 50%;
+}
+
+.dot[data-hot] {
+  background: var(--box);
+  transform: scale(1.25);
+}
+
+/* pointing at a year dot: that year's papers stay, the rest recede */
+.timeline[data-linking] .row:not([data-hot]) {
+  opacity: 0.3;
+}
+
+/* papers leaving on a filter change blur and fade before the list moves */
+.timeline .row[data-leaving] {
+  opacity: 0;
+  filter: blur(4px);
 }
 
 @supports (animation-timeline: view()) {
@@ -146,7 +173,7 @@
     animation-range: entry 0% exit 0%;
   }
 
-  .timeline .row[data-newyear]::after {
+  .dot {
     animation: dot-in linear both;
     animation-timeline: view();
     animation-range: entry 40% entry 100%;
@@ -174,7 +201,10 @@
 .animated .row {
   position: relative;
   isolation: isolate;
-  transition: transform 0.3s var(--ease);
+  transition:
+    transform 0.3s var(--ease),
+    opacity 0.3s,
+    filter 0.3s;
 }
 
 .animated .row::before {

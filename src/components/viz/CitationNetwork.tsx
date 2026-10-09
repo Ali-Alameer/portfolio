@@ -9,11 +9,15 @@ type Node = { x: number; y: number; r: number; hub: number; delay: number; drift
 // A faint citation graph: one hub per selected paper, sized by its
 // citations, with citing works linked to it. Links draw themselves in when
 // the section first comes into view, then the graph breathes slowly and the
-// odd new citation travels along a link.
+// odd new citation travels along a link. Pointing at a paper's card
+// (Publications sets data-focus on the section) lights up its node and links.
 export default function CitationNetwork({ weights }: { weights: number[] }) {
   const ref = useRef<HTMLCanvasElement>(null);
   const layout = useMemo(() => build(weights), [weights]);
-  useCanvas(ref, (f) => draw(f, layout));
+  useCanvas(ref, (f) => {
+    const focus = ref.current?.closest<HTMLElement>("section")?.dataset.focus;
+    draw(f, layout, focus === undefined ? -1 : Number(focus));
+  });
   return <canvas ref={ref} className={`${styles.canvas} ${styles.figure}`} aria-hidden="true" />;
 }
 
@@ -50,10 +54,17 @@ function build(weights: number[]) {
   const cross: [number, number][] = [];
   for (let i = 0; i < hubs.length; i++)
     for (let j = i + 1; j < hubs.length; j++) if (rand() < 0.35) cross.push([i, j]);
-  return { hubs, sats, cross };
+  // per-hub highlight level, eased towards its target each frame
+  const glow = hubs.map(() => 0);
+  return { hubs, sats, cross, glow };
 }
 
-function draw({ ctx, w, h, t, p }: Frame, { hubs, sats, cross }: ReturnType<typeof build>) {
+function draw({ ctx, w, h, t, p }: Frame, { hubs, sats, cross, glow }: ReturnType<typeof build>, focus: number) {
+  glow.forEach((g, i) => (glow[i] = g + ((i === focus ? 1 : 0) - g) * 0.12));
+  const any = Math.max(...glow);
+  // focused items brighten, everything else steps back
+  const lit = (i: number, base: number) => base * (1 - 0.55 * any) + glow[i] * 0.6;
+
   const sway = (n: Node) => ({
     x: (n.x + 0.006 * Math.sin(t * 0.0004 + n.drift)) * w,
     y: (n.y + 0.008 * Math.cos(t * 0.00035 + n.drift)) * h,
@@ -65,7 +76,8 @@ function draw({ ctx, w, h, t, p }: Frame, { hubs, sats, cross }: ReturnType<type
   for (const [i, j] of cross) {
     const k = ease((t - 1400 - i * 120) / 900);
     if (k <= 0) continue;
-    ctx.globalAlpha = 0.35;
+    ctx.globalAlpha = lit(i, 0.35) + glow[j] * 0.6;
+    ctx.strokeStyle = glow[i] + glow[j] > 0.1 ? p.box : p.muted;
     ctx.beginPath();
     ctx.moveTo(H[i].x, H[i].y);
     ctx.lineTo(H[i].x + (H[j].x - H[i].x) * k, H[i].y + (H[j].y - H[i].y) * k);
@@ -77,8 +89,8 @@ function draw({ ctx, w, h, t, p }: Frame, { hubs, sats, cross }: ReturnType<type
     if (k <= 0) return;
     const a = sway(s);
     const b = H[s.hub];
-    ctx.globalAlpha = 0.4;
-    ctx.strokeStyle = p.muted;
+    ctx.globalAlpha = Math.min(1, lit(s.hub, 0.4));
+    ctx.strokeStyle = glow[s.hub] > 0.05 ? p.box : p.muted;
     ctx.beginPath();
     ctx.moveTo(a.x, a.y);
     ctx.lineTo(a.x + (b.x - a.x) * k, a.y + (b.y - a.y) * k);
@@ -105,13 +117,13 @@ function draw({ ctx, w, h, t, p }: Frame, { hubs, sats, cross }: ReturnType<type
   hubs.forEach((n, i) => {
     const k = ease((t - n.delay) / 700);
     if (k <= 0) return;
-    ctx.globalAlpha = 0.9 * k;
+    ctx.globalAlpha = Math.min(1, lit(i, 0.9)) * k;
     ctx.strokeStyle = p.box;
-    ctx.lineWidth = 1.25;
+    ctx.lineWidth = 1.25 + glow[i];
     ctx.beginPath();
-    ctx.arc(H[i].x, H[i].y, n.r * k, 0, Math.PI * 2);
+    ctx.arc(H[i].x, H[i].y, (n.r + 2 * glow[i]) * k, 0, Math.PI * 2);
     ctx.stroke();
-    ctx.globalAlpha = 0.18 * k;
+    ctx.globalAlpha = (0.18 + 0.5 * glow[i]) * k;
     ctx.fillStyle = p.box;
     ctx.fill();
   });

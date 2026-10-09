@@ -18,7 +18,9 @@ export default function Reveal() {
           reveal.unobserve(e.target);
         }
       },
-      { rootMargin: "0px 0px -8% 0px", threshold: 0.08 },
+      // any part past the bottom 8% of the screen counts, so blocks taller
+      // than the viewport (the full publication list on a phone) still reveal
+      { rootMargin: "0px 0px -8% 0px", threshold: 0 },
     );
     blocks.forEach((b) => reveal.observe(b));
 
