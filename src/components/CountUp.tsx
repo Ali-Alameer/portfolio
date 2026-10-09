@@ -6,8 +6,19 @@ const nf = new Intl.NumberFormat("en-GB");
 
 // Renders the final figure on the server, then counts up to it the first time
 // it scrolls into view. Skipped when the visitor prefers reduced motion.
-export default function CountUp({ value, delay = 0 }: { value: number; delay?: number }) {
+// The final figure stays in the flow (transparent) so the surrounding text
+// never reflows while the digits change, and it is what screen readers get.
+export default function CountUp({
+  value,
+  delay = 0,
+  prefix = "",
+}: {
+  value: number;
+  delay?: number;
+  prefix?: string;
+}) {
   const ref = useRef<HTMLSpanElement>(null);
+  const final = prefix + nf.format(value);
 
   useEffect(() => {
     const el = ref.current;
@@ -16,13 +27,13 @@ export default function CountUp({ value, delay = 0 }: { value: number; delay?: n
     const duration = 1600;
     let raf = 0;
     let start = 0;
-    el.textContent = "0";
+    el.textContent = prefix + "0";
 
     const tick = (t: number) => {
       if (!start) start = t + delay;
       const p = Math.min(Math.max((t - start) / duration, 0), 1);
       const eased = 1 - Math.pow(1 - p, 4);
-      el.textContent = nf.format(Math.round(value * eased));
+      el.textContent = prefix + nf.format(Math.round(value * eased));
       if (p < 1) raf = requestAnimationFrame(tick);
     };
 
@@ -39,9 +50,16 @@ export default function CountUp({ value, delay = 0 }: { value: number; delay?: n
     return () => {
       io.disconnect();
       cancelAnimationFrame(raf);
-      el.textContent = nf.format(value);
+      el.textContent = prefix + nf.format(value);
     };
-  }, [value, delay]);
+  }, [value, delay, prefix]);
 
-  return <span ref={ref}>{nf.format(value)}</span>;
+  return (
+    <span style={{ position: "relative", display: "inline-block", whiteSpace: "nowrap" }}>
+      <span style={{ color: "transparent" }}>{final}</span>
+      <span ref={ref} aria-hidden="true" style={{ position: "absolute", left: 0, top: 0 }}>
+        {final}
+      </span>
+    </span>
+  );
 }

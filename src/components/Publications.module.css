@@ -102,8 +102,40 @@
   color: var(--muted);
 }
 
+@supports not (animation-timeline: view()) {
+  .animated .row {
+    animation: rise 0.5s var(--ease) calc(var(--i, 0) * 30ms) both;
+  }
+}
+
+/* full list: rows lift onto a card surface on hover; the surface is a
+   pseudo-element that overhangs the row, so the dividers stay aligned */
 .animated .row {
-  animation: rise 0.5s var(--ease) calc(var(--i, 0) * 30ms) both;
+  position: relative;
+  isolation: isolate;
+  transition: transform 0.3s var(--ease);
+}
+
+.animated .row::before {
+  content: "";
+  position: absolute;
+  inset: 0 -0.85rem;
+  z-index: -1;
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: 0 14px 30px -24px rgb(0 0 0 / 0.4);
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.animated .row:hover,
+.animated .row:focus-within {
+  transform: translateY(-2px);
+}
+
+.animated .row:hover::before,
+.animated .row:focus-within::before {
+  opacity: 1;
 }
 
 .main {

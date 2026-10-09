@@ -18,7 +18,7 @@ export default function CitationChart() {
   const last = data[data.length - 1];
 
   return (
-    <figure className={styles.figure}>
+    <figure className={styles.figure} data-inview>
       <svg
         viewBox={`0 0 ${W} ${H}`}
         className={styles.svg}

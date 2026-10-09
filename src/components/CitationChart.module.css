@@ -20,16 +20,28 @@
 .partial {
   transform-box: fill-box;
   transform-origin: bottom;
-  /* bars grow from the baseline left to right, after the panel arrives */
-  animation: grow 0.9s cubic-bezier(0.22, 1, 0.36, 1) calc(500ms + var(--i, 0) * 60ms) both;
+}
+
+/* Bars wait at the baseline until the chart scrolls into view (Reveal adds
+   data-shown), then grow left to right. Without JavaScript they just show. */
+:root[data-js] .figure:not([data-shown]) :is(.bar, .partial) {
+  transform: scaleY(0);
+}
+
+.figure[data-shown] :is(.bar, .partial) {
+  animation: grow 0.9s cubic-bezier(0.22, 1, 0.36, 1) calc(300ms + var(--i, 0) * 60ms) both;
 }
 
 .bar {
   fill: var(--box);
 }
 
-.value {
-  animation: fade 0.5s ease-out 1.4s both;
+:root[data-js] .figure:not([data-shown]) .value {
+  opacity: 0;
+}
+
+.figure[data-shown] .value {
+  animation: fade 0.5s ease-out 1.2s both;
 }
 
 @keyframes grow {

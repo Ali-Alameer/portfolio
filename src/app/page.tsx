@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import CitationChart from "@/components/CitationChart";
 import CountUp from "@/components/CountUp";
-import HeroBackdrop from "@/components/HeroBackdrop";
+import NetworkBackdrop from "@/components/NetworkBackdrop";
 import Publications, { SelectedPublications } from "@/components/Publications";
 import Reveal from "@/components/Reveal";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -23,10 +23,16 @@ const gbp = new Intl.NumberFormat("en-GB", {
   currency: "GBP",
   maximumFractionDigits: 0,
 });
-const nf = new Intl.NumberFormat("en-GB");
 
 // Stagger step for entrance and reveal animations, read by the CSS as --i.
 const step = (i: number) => ({ "--i": i }) as CSSProperties;
+
+// Theme tags read like detector output, "pig · drinking  0.94": split off the
+// score so it can count up when the card's box locks on.
+function splitTag(tag: string) {
+  const m = tag.match(/^(.*\S)\s+0\.(\d+)$/);
+  return m ? { label: m[1], score: Number(m[2]) } : { label: tag, score: null };
+}
 
 const nav = [
   { href: "#research", label: "Research" },
@@ -67,7 +73,7 @@ export default function Home() {
       <main id="main">
         {/* Hero ------------------------------------------------------- */}
         <section className={styles.hero} aria-labelledby="hero-name">
-          <HeroBackdrop />
+          <NetworkBackdrop />
           <p className={`${styles.eyebrow} ${styles.enter}`} style={step(0)}>
             {profile.role} · {profile.university}
           </p>
@@ -142,7 +148,7 @@ export default function Home() {
         </section>
 
         {/* Research --------------------------------------------------- */}
-        <section id="research" className={styles.section} aria-labelledby="research-h">
+        <section id="research" className={`${styles.section} ${styles.tinted}`} aria-labelledby="research-h">
           <div className={styles.sectionHead} data-reveal>
             <p className={styles.eyebrow}>Research</p>
             <h2 id="research-h">AI that has to work outside the lab</h2>
@@ -153,20 +159,30 @@ export default function Home() {
             </p>
           </div>
           <div className={styles.themes}>
-            {themes.map((t, i) => (
-              <article key={t.id} className={styles.theme} data-reveal style={step(i % 2)}>
-                <p className={styles.tag}>{t.tag}</p>
-                <h3>{t.title}</h3>
-                <p>{t.body}</p>
-                <p className={styles.themeMeta}>
-                  {publications.filter((p) => p.theme === t.id).length} papers ·{" "}
-                  {nf.format(
-                    publications.filter((p) => p.theme === t.id).reduce((s, p) => s + p.citations, 0),
-                  )}{" "}
-                  citations
-                </p>
-              </article>
-            ))}
+            {themes.map((t, i) => {
+              const tag = splitTag(t.tag);
+              return (
+                <article key={t.id} className={styles.theme} data-reveal style={step(i % 2)}>
+                  {/* decorative detector box and label, hidden from screen readers */}
+                  <span className={styles.detBox} aria-hidden="true">
+                    <span className={styles.detLabel}>
+                      {tag.label}
+                      {tag.score !== null && (
+                        <span
+                          className={styles.score}
+                          style={{ "--score": tag.score } as CSSProperties}
+                        />
+                      )}
+                    </span>
+                  </span>
+                  <h3>{t.title}</h3>
+                  <p>{t.body}</p>
+                  <p className={styles.themeMeta}>
+                    {publications.filter((p) => p.theme === t.id).length} papers
+                  </p>
+                </article>
+              );
+            })}
           </div>
         </section>
 
@@ -176,7 +192,7 @@ export default function Home() {
             <p className={styles.eyebrow}>Funding</p>
             <h2 id="funding-h">Grants, KTPs and consultancy</h2>
             <p className={styles.intro}>
-              {gbp.format(totalFunding)} across {grants.length} awards, including {ongoing.length}{" "}
+              <CountUp value={totalFunding} prefix="£" /> across {grants.length} awards, including {ongoing.length}{" "}
               projects in progress worth {gbp.format(ongoingTotal)}. Three of those are Innovate UK
               Knowledge Transfer Partnerships, each placing a KTP Associate inside the partner
               company.
@@ -238,7 +254,7 @@ export default function Home() {
         </section>
 
         {/* Teaching & supervision ------------------------------------- */}
-        <section id="teaching" className={styles.section} aria-labelledby="teaching-h">
+        <section id="teaching" className={`${styles.section} ${styles.tinted}`} aria-labelledby="teaching-h">
           <div className={styles.sectionHead} data-reveal>
             <p className={styles.eyebrow}>Teaching</p>
             <h2 id="teaching-h">Modules I designed and lead</h2>
@@ -269,7 +285,7 @@ export default function Home() {
             ))}
           </div>
 
-          <ul className={styles.repos} data-reveal>
+          <ul className={styles.repos} data-stagger>
             {repos.map((r) => (
               <li key={r.name}>
                 <a href={`${profile.links.github}/${r.name}`} target="_blank" rel="noreferrer">
@@ -283,7 +299,7 @@ export default function Home() {
           <div className={styles.people} data-reveal>
             <div>
               <h3>Current research students</h3>
-              <ul>
+              <ul data-stagger>
                 {supervision.current.map((s) => (
                   <li key={s.name}>
                     <span className={styles.personName}>
@@ -296,7 +312,7 @@ export default function Home() {
             </div>
             <div>
               <h3>Completed doctorates</h3>
-              <ul>
+              <ul data-stagger>
                 {supervision.completed.map((s) => (
                   <li key={s.name}>
                     <span className={styles.personName}>
@@ -309,7 +325,7 @@ export default function Home() {
             </div>
             <div>
               <h3>KTP Associates</h3>
-              <ul>
+              <ul data-stagger>
                 {supervision.ktpAssociates.map((s) => (
                   <li key={s.name}>
                     <span className={styles.personName}>{s.name}</span>
@@ -328,7 +344,7 @@ export default function Home() {
             <h2 id="pubs-h">Papers, 2015 to {Math.max(...publications.map((p) => p.year))}</h2>
             <p className={styles.intro}>
               Journal articles, conference papers and my PhD thesis. Citation counts are from Google
-              Scholar ({scholarStats.asOf}). Titles link to a Scholar search for the paper.
+              Scholar ({scholarStats.asOf}). Titles link to the paper, or to a Scholar search where there is no DOI.
             </p>
           </div>
           <div data-reveal>
@@ -337,7 +353,7 @@ export default function Home() {
 
           <div className={styles.datasets} data-reveal>
             <h3>Open datasets</h3>
-            <ul>
+            <ul data-stagger>
               {datasets.map((d) => (
                 <li key={d.title}>
                   <span className={styles.dsYear}>{d.year}</span>
@@ -352,7 +368,9 @@ export default function Home() {
         </section>
 
         {/* Contact ---------------------------------------------------- */}
-        <section id="contact" className={styles.contact} aria-labelledby="contact-h" data-reveal>
+        <section id="contact" className={styles.contact} aria-labelledby="contact-h">
+          <NetworkBackdrop />
+          <div className={styles.contactInner} data-reveal>
           <p className={styles.eyebrow}>Contact</p>
           <h2 id="contact-h">
             Working on a vision or language problem? I&apos;m open to KTPs, PhD applicants and
@@ -383,6 +401,7 @@ export default function Home() {
               </a>
             </li>
           </ul>
+          </div>
         </section>
       </main>
 

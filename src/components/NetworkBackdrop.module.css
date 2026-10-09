@@ -1,4 +1,4 @@
-/* Fills the hero behind its content: a dark field with two soft colour
+/* Fills a dark band (hero, contact) behind its content: a dark field with two soft colour
    glows, the canvas network on top, and a shade that keeps the text column
    darkest. */
 .backdrop {

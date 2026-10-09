@@ -1,17 +1,17 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import styles from "./HeroBackdrop.module.css";
+import styles from "./NetworkBackdrop.module.css";
 
 const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-/* A slow drifting point network behind the hero. Now and then a detection
+/* A slow drifting point network, used behind the hero and contact bands. Now and then a detection
    box settles around one of the points, the same motif as the box on the
    name. */
 type Node = { x: number; y: number; vx: number; vy: number; r: number };
 type Box = { node: Node; born: number; size: number };
 
-export default function HeroBackdrop() {
+export default function NetworkBackdrop() {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {

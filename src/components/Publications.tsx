@@ -1,13 +1,20 @@
 "use client";
 
 import { useMemo, useState, type CSSProperties } from "react";
-import { publications, themes, type ThemeId } from "@/data/profile";
+import { publications, themes, type Publication, type ThemeId } from "@/data/profile";
 import styles from "./Publications.module.css";
 
 type Filter = ThemeId | "all";
 type Sort = "year" | "cited";
 
 const nf = new Intl.NumberFormat("en-GB");
+
+// The paper itself when Crossref gave us a DOI, otherwise a Scholar search.
+function paperUrl(p: Publication) {
+  return p.doi
+    ? `https://doi.org/${p.doi}`
+    : `https://scholar.google.com/scholar?q=${encodeURIComponent(`"${p.title}"`)}`;
+}
 
 function Authors({ text }: { text: string }) {
   const parts = text.split(/(A Alameer)/);
@@ -35,7 +42,7 @@ export function SelectedPublications({ count = 5 }: { count?: number }) {
           <h3 className={styles.cardTitle}>
             {/* the link covers the whole card; see .cardTitle a::after */}
             <a
-              href={`https://scholar.google.com/scholar?q=${encodeURIComponent(`"${p.title}"`)}`}
+              href={paperUrl(p)}
               target="_blank"
               rel="noreferrer"
             >
@@ -102,15 +109,16 @@ export default function Publications() {
         </label>
       </div>
 
-      {/* keyed on the view so a new filter or sort replays the row entrance */}
-      <ol key={`${filter}-${sort}`} className={`${styles.list} ${styles.animated}`}>
+      {/* keyed on the view so a new filter or sort replays the row entrance;
+          rows also fade in on scroll ([data-stagger]) where supported */}
+      <ol key={`${filter}-${sort}`} className={`${styles.list} ${styles.animated}`} data-stagger>
         {rows.map((p, i) => (
           <li key={p.title} className={styles.row} style={{ "--i": Math.min(i, 12) } as CSSProperties}>
             <span className={styles.year}>{p.year}</span>
             <div className={styles.main}>
               <h3 className={styles.title}>
                 <a
-                  href={`https://scholar.google.com/scholar?q=${encodeURIComponent(`"${p.title}"`)}`}
+                  href={paperUrl(p)}
                   target="_blank"
                   rel="noreferrer"
                 >
