@@ -1,16 +1,16 @@
 "use client";
 
 import { useRef } from "react";
-import { drawEncoder, H0, LOOP, W0 } from "./viz/encoderFigure";
+import { drawVit, H0, LOOP, W0 } from "./viz/vitFigure";
 import { useCanvas } from "./viz/useCanvas";
 import styles from "./EmbeddingBackdrop.module.css";
 
-// The hero's only animation: a transformer encoder figure running a slow,
-// looping forward pass (viz/encoderFigure), placed in the open space at the
-// upper right so the name and intro stay clear. Hidden where the hero is a
+// The hero's only animation: a vision transformer reading a ceiling-camera
+// frame of a pig pen, from image to prediction (viz/vitFigure), placed in
+// the open space at the upper right so the name and intro stay clear. Hidden where the hero is a
 // single column (phones, narrow tablets): at that size its numbers would be
 // too small to read. Under reduced motion it shows the finished pass, still.
-export default function EncoderBackdrop() {
+export default function VitBackdrop() {
   const ref = useRef<HTMLCanvasElement>(null);
   const mono = useRef("");
 
@@ -31,11 +31,11 @@ export default function EncoderBackdrop() {
       ctx.save();
       ctx.translate(w * 0.985 - W0 * s, h * 0.035);
       ctx.scale(s, s);
-      drawEncoder(ctx, t, p, mono.current, s);
+      drawVit(ctx, t, p, mono.current, s);
       ctx.restore();
     },
     // still frame: the pass just completed, with every stage filled in
-    LOOP - 1200,
+    LOOP - 1500,
   );
 
   return (

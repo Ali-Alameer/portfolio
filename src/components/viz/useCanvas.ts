@@ -12,6 +12,8 @@ export { ease, rng } from "./math";
 
 export type Palette = {
   box: string;
+  /** text colour on an accent fill */
+  boxInk: string;
   live: string;
   ink: string;
   muted: string;
@@ -135,6 +137,7 @@ function readPalette(el: Element): Palette {
   const v = (name: string, fallback: string) => css.getPropertyValue(name).trim() || fallback;
   return {
     box: v("--box", "#3a3edc"),
+    boxInk: v("--box-ink", "#ffffff"),
     live: v("--live", "#1d7a4b"),
     ink: v("--ink", "#121815"),
     muted: v("--muted", "#58625c"),

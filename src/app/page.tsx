@@ -8,7 +8,7 @@ import LossCurve from "@/components/viz/LossCurve";
 import SignalTrace from "@/components/viz/SignalTrace";
 import StrandVisual from "@/components/viz/StrandVisual";
 import EmbeddingBackdrop from "@/components/EmbeddingBackdrop";
-import EncoderBackdrop from "@/components/EncoderBackdrop";
+import VitBackdrop from "@/components/VitBackdrop";
 import Publications, { SelectedPublications } from "@/components/Publications";
 import Interactions from "@/components/Interactions";
 import Reveal from "@/components/Reveal";
@@ -89,8 +89,8 @@ export default function Home() {
       <main id="main">
         {/* Hero ------------------------------------------------------- */}
         <section className={styles.hero} aria-labelledby="hero-name">
-          {/* a transformer encoder running a forward pass, upper right */}
-          <EncoderBackdrop />
+          {/* a vision transformer reading a pig pen, upper right */}
+          <VitBackdrop />
           <p className={`${styles.eyebrow} ${styles.enter}`} style={step(0)}>
             {profile.role} · {profile.university}
           </p>
