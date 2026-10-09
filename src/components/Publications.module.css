@@ -102,9 +102,70 @@
   color: var(--muted);
 }
 
-@supports not (animation-timeline: view()) {
-  .animated .row {
-    animation: rise 0.5s var(--ease) calc(var(--i, 0) * 30ms) both;
+/* Full list timeline ------------------------------------------------
+   A faint track down the left edge, a line that draws down it as you
+   scroll through the list, and a dot at the first paper of each year. */
+.timeline {
+  position: relative;
+  padding-left: 1.75rem;
+}
+
+.timeline::before,
+.timeline::after {
+  content: "";
+  position: absolute;
+  left: 0.45rem;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--line);
+}
+
+.timeline::after {
+  background: var(--box);
+  opacity: 0.7;
+  transform-origin: top;
+}
+
+.timeline .row[data-newyear]::after {
+  content: "";
+  position: absolute;
+  left: calc(-1.75rem + 0.45rem - 3.5px);
+  top: 1.45rem;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1.5px solid var(--box);
+  background: var(--paper);
+}
+
+@supports (animation-timeline: view()) {
+  .timeline::after {
+    animation: draw-down linear both;
+    animation-timeline: view();
+    animation-range: entry 0% exit 0%;
+  }
+
+  .timeline .row[data-newyear]::after {
+    animation: dot-in linear both;
+    animation-timeline: view();
+    animation-range: entry 40% entry 100%;
+  }
+}
+
+@keyframes draw-down {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes dot-in {
+  from {
+    transform: scale(0);
+    opacity: 0;
   }
 }
 
@@ -219,7 +280,7 @@
   display: grid;
   grid-template-rows: auto auto 1fr auto;
   gap: 0.6rem;
-  padding: 1.35rem 1.4rem 1.4rem;
+  padding: 1.35rem 1.4rem 1.9rem;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -307,6 +368,40 @@
 
 [data-shown] .card {
   animation: rise 0.7s var(--ease) calc(var(--i, 0) * 80ms) both;
+}
+
+/* thin bar along the card's foot, filled in proportion to citations */
+.citeBar {
+  position: absolute;
+  left: 1.4rem;
+  right: 1.4rem;
+  bottom: 0.7rem;
+  height: 2px;
+  background: var(--line);
+  pointer-events: none;
+}
+
+.citeBar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: calc(var(--share) * 100%);
+  background: var(--box);
+  transform-origin: left;
+}
+
+:root[data-js] :not([data-shown]) > .cards .citeBar::after {
+  transform: scaleX(0);
+}
+
+[data-shown] .citeBar::after {
+  animation: fill-x 1.4s var(--ease) calc(400ms + var(--i, 0) * 120ms) both;
+}
+
+@keyframes fill-x {
+  from {
+    transform: scaleX(0);
+  }
 }
 
 .card:hover .corners,

@@ -1,6 +1,9 @@
 import type { CSSProperties } from "react";
 import CitationChart from "@/components/CitationChart";
 import CountUp from "@/components/CountUp";
+import CitationNetwork from "@/components/viz/CitationNetwork";
+import ForwardPass from "@/components/viz/ForwardPass";
+import StrandVisual from "@/components/viz/StrandVisual";
 import NetworkBackdrop from "@/components/NetworkBackdrop";
 import Publications, { SelectedPublications } from "@/components/Publications";
 import Reveal from "@/components/Reveal";
@@ -46,6 +49,15 @@ export default function Home() {
   const ongoing = grants.filter((g) => g.status === "Ongoing");
   const ongoingTotal = ongoing.reduce((s, g) => s + g.amount, 0);
   const largestGrant = Math.max(...grants.map((g) => g.amount));
+  // funding split by kind of award, in table order (KTP, Grant, Consultancy)
+  const kinds = [...new Set(grants.map((g) => g.kind))].map((kind) => ({
+    kind,
+    total: grants.filter((g) => g.kind === kind).reduce((s, g) => s + g.amount, 0),
+  }));
+  const topCitations = [...publications]
+    .sort((a, b) => b.citations - a.citations)
+    .slice(0, 5)
+    .map((p) => p.citations);
 
   return (
     <div className={styles.page}>
@@ -133,7 +145,8 @@ export default function Home() {
 
         {/* Selected publications ---------------------------------- */}
         <section id="selected" className={styles.section} aria-labelledby="selected-h">
-          <div className={styles.sectionHead} data-reveal>
+          <CitationNetwork weights={topCitations} />
+          <div className={styles.sectionHead} data-scan>
             <p className={styles.eyebrow}>Selected publications</p>
             <h2 id="selected-h">Five most cited papers</h2>
             <p className={styles.intro}>
@@ -148,7 +161,7 @@ export default function Home() {
 
         {/* Research --------------------------------------------------- */}
         <section id="research" className={`${styles.section} ${styles.tinted}`} aria-labelledby="research-h">
-          <div className={styles.sectionHead} data-reveal>
+          <div className={styles.sectionHead} data-scan>
             <p className={styles.eyebrow}>Research</p>
             <h2 id="research-h">AI that has to work outside the lab</h2>
             <p className={styles.intro}>
@@ -162,6 +175,7 @@ export default function Home() {
               const tag = splitTag(t.tag);
               return (
                 <article key={t.id} className={styles.theme} data-reveal style={step(i % 2)}>
+                  <StrandVisual kind={t.id} />
                   {/* decorative detector box and label, hidden from screen readers */}
                   <span className={styles.detBox} aria-hidden="true">
                     <span className={styles.detLabel}>
@@ -187,7 +201,7 @@ export default function Home() {
 
         {/* Funding ---------------------------------------------------- */}
         <section id="funding" className={styles.section} aria-labelledby="funding-h">
-          <div className={styles.sectionHead} data-reveal>
+          <div className={styles.sectionHead} data-scan>
             <p className={styles.eyebrow}>Funding</p>
             <h2 id="funding-h">Grants, KTPs and consultancy</h2>
             <p className={styles.intro}>
@@ -197,7 +211,7 @@ export default function Home() {
               company.
             </p>
           </div>
-          <div className={styles.tableWrap} data-reveal>
+          <div className={styles.tableWrap} data-scan>
             {/* each award as a share of the total; the table below carries the figures */}
             <div className={styles.fundingBar} aria-hidden="true">
               {grants.map((g, i) => (
@@ -207,6 +221,12 @@ export default function Home() {
                   title={`${g.title}: ${gbp.format(g.amount)}`}
                   style={{ ...step(i), flexGrow: g.amount }}
                 />
+              ))}
+            </div>
+            {/* the same total split by kind of award, coloured like the Type tags */}
+            <div className={styles.kindBar} aria-hidden="true">
+              {kinds.map((k) => (
+                <span key={k.kind} data-kind={k.kind} style={{ flexGrow: k.total }} />
               ))}
             </div>
             <table className={styles.table}>
@@ -230,7 +250,7 @@ export default function Home() {
                       {g.partner ? <span className={styles.partner}> · {g.partner}</span> : null}
                     </td>
                     <td className={styles.kind} data-label="Type">
-                      <span>{g.kind}</span>
+                      <span data-kind={g.kind}>{g.kind}</span>
                     </td>
                     <td data-label="Status">
                       <span className={styles.status} data-status={g.status}>
@@ -255,7 +275,8 @@ export default function Home() {
 
         {/* Teaching & supervision ------------------------------------- */}
         <section id="teaching" className={`${styles.section} ${styles.tinted}`} aria-labelledby="teaching-h">
-          <div className={styles.sectionHead} data-reveal>
+          <ForwardPass />
+          <div className={styles.sectionHead} data-scan>
             <p className={styles.eyebrow}>Teaching</p>
             <h2 id="teaching-h">Modules I designed and lead</h2>
             <p className={styles.intro}>
@@ -343,7 +364,7 @@ export default function Home() {
 
         {/* Publications ----------------------------------------------- */}
         <section id="publications" className={styles.section} aria-labelledby="pubs-h">
-          <div className={styles.sectionHead} data-reveal>
+          <div className={styles.sectionHead} data-scan>
             <p className={styles.eyebrow}>Publications</p>
             <h2 id="pubs-h">Papers, 2015 to {Math.max(...publications.map((p) => p.year))}</h2>
             <p className={styles.intro}>

@@ -156,6 +156,77 @@ img {
   }
 }
 
+/* Scan reveal ------------------------------------------------------
+   [data-scan] blocks are uncovered top to bottom by a thin line sweeping
+   down, like an image being read by a vision model; the faint trail above
+   the line is the "processed" region. The reveal is a mask driven by
+   --scan rather than a clip-path, because a fully clipped element never
+   registers with IntersectionObserver. Hidden only when JavaScript can
+   reveal it. */
+@property --scan {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+
+[data-scan] {
+  position: relative;
+  mask-image: linear-gradient(to bottom, #000 var(--scan), transparent var(--scan));
+}
+
+:root[data-js] [data-scan]:not([data-shown]) {
+  --scan: 0%;
+}
+
+[data-scan][data-shown] {
+  animation: scan-reveal 1.3s cubic-bezier(0.45, 0, 0.2, 1) both;
+}
+
+[data-scan]::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -2.5rem;
+  height: 2.5rem;
+  pointer-events: none;
+  opacity: 0;
+  border-bottom: 1px solid var(--box);
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in srgb, var(--box) 8%, transparent)
+  );
+}
+
+[data-scan][data-shown]::after {
+  animation: scan-line 1.3s cubic-bezier(0.45, 0, 0.2, 1) both;
+}
+
+@keyframes scan-reveal {
+  from {
+    --scan: 0%;
+  }
+  to {
+    --scan: 100%;
+  }
+}
+
+@keyframes scan-line {
+  0% {
+    top: -2.5rem;
+    opacity: 0;
+  }
+  12%,
+  80% {
+    opacity: 1;
+  }
+  100% {
+    top: calc(100% - 2.5rem);
+    opacity: 0;
+  }
+}
+
 /* Items in a [data-stagger] list fade up as each one enters the viewport,
    driven by scroll position. Browsers without scroll-driven animations
    simply show the items. */

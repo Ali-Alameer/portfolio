@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type CSSProperties } from "react";
+import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { publications, themes, type Publication, type ThemeId } from "@/data/profile";
 import styles from "./Publications.module.css";
 
@@ -27,6 +27,7 @@ function Authors({ text }: { text: string }) {
 
 export function SelectedPublications({ count = 5 }: { count?: number }) {
   const rows = [...publications].sort((a, b) => b.citations - a.citations).slice(0, count);
+  const most = rows[0]?.citations || 1;
 
   return (
     <ol className={styles.cards}>
@@ -53,6 +54,12 @@ export function SelectedPublications({ count = 5 }: { count?: number }) {
             <Authors text={p.authors} />
           </p>
           <p className={styles.venue}>{p.venue}</p>
+          {/* citations relative to the most cited paper */}
+          <span
+            className={styles.citeBar}
+            aria-hidden="true"
+            style={{ "--share": p.citations / most } as CSSProperties}
+          />
           <span className={styles.corners} aria-hidden="true" />
         </li>
       ))}
@@ -77,6 +84,49 @@ export default function Publications() {
     return c;
   }, []);
 
+  // When the filter or sort changes, rows glide from their old positions to
+  // their new ones (FLIP): measure before the update, then animate the
+  // difference after React has re-rendered. Rows new to the view fade in.
+  const listRef = useRef<HTMLOListElement>(null);
+  const before = useRef<Map<string, number> | null>(null);
+
+  const measure = () => {
+    const m = new Map<string, number>();
+    listRef.current
+      ?.querySelectorAll<HTMLElement>("[data-key]")
+      .forEach((el) => m.set(el.dataset.key!, el.getBoundingClientRect().top));
+    return m;
+  };
+
+  useLayoutEffect(() => {
+    const prev = before.current;
+    before.current = null;
+    if (!prev || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    listRef.current?.querySelectorAll<HTMLElement>("[data-key]").forEach((el) => {
+      const old = prev.get(el.dataset.key!);
+      if (old === undefined) {
+        el.animate([{ opacity: 0 }, { opacity: 1 }], {
+          duration: 450,
+          delay: 200,
+          easing: "ease-out",
+          fill: "backwards",
+        });
+        return;
+      }
+      const dy = old - el.getBoundingClientRect().top;
+      if (Math.abs(dy) < 1) return;
+      el.animate([{ transform: `translateY(${dy}px)` }, { transform: "translateY(0)" }], {
+        duration: 700,
+        easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+      });
+    });
+  }, [rows]);
+
+  const change = (update: () => void) => {
+    before.current = measure();
+    update();
+  };
+
   const options: { id: Filter; label: string }[] = [
     { id: "all", label: "All" },
     ...themes.map((t) => ({ id: t.id, label: t.label })),
@@ -93,7 +143,7 @@ export default function Publications() {
               type="button"
               className={styles.chip}
               aria-pressed={filter === o.id}
-              onClick={() => setFilter(o.id)}
+              onClick={() => change(() => setFilter(o.id))}
             >
               {o.label}
               <span className={styles.count}>{counts[o.id] ?? 0}</span>
@@ -102,18 +152,27 @@ export default function Publications() {
         </div>
         <label className={styles.sort} htmlFor="pub-sort">
           Sort by
-          <select id="pub-sort" value={sort} onChange={(e) => setSort(e.target.value as Sort)}>
+          <select id="pub-sort" value={sort} onChange={(e) => {
+              const v = e.target.value as Sort;
+              change(() => setSort(v));
+            }}>
             <option value="year">Newest first</option>
             <option value="cited">Most cited</option>
           </select>
         </label>
       </div>
 
-      {/* keyed on the view so a new filter or sort replays the row entrance;
-          rows also fade in on scroll ([data-stagger]) where supported */}
-      <ol key={`${filter}-${sort}`} className={`${styles.list} ${styles.animated}`} data-stagger>
+      {/* a timeline runs down the left edge with a dot where each new year
+          starts; rows fade in on scroll ([data-stagger]) where supported */}
+      <ol ref={listRef} className={`${styles.list} ${styles.animated} ${styles.timeline}`} data-stagger>
         {rows.map((p, i) => (
-          <li key={p.title} className={styles.row} style={{ "--i": Math.min(i, 12) } as CSSProperties}>
+          <li
+            key={p.title}
+            data-key={p.title}
+            data-newyear={i === 0 || rows[i - 1].year !== p.year || undefined}
+            className={styles.row}
+            style={{ "--i": Math.min(i, 12) } as CSSProperties}
+          >
             <span className={styles.year}>{p.year}</span>
             <div className={styles.main}>
               <h3 className={styles.title}>

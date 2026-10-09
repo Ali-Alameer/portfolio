@@ -2,13 +2,14 @@
 
 import { useEffect } from "react";
 
-// Marks [data-reveal] and [data-inview] blocks as shown once they scroll into
-// view, and flags the nav link for the section currently on screen. Only
-// [data-reveal] starts hidden, and only under html[data-js], so without
-// JavaScript nothing is hidden. [data-inview] just triggers its own effects.
+// Marks [data-reveal], [data-scan] and [data-inview] blocks as shown once they
+// scroll into view, and flags the nav link for the section currently on
+// screen. Only [data-reveal] and [data-scan] start hidden, and only under
+// html[data-js], so without JavaScript nothing is hidden. [data-inview] just
+// triggers its own effects.
 export default function Reveal() {
   useEffect(() => {
-    const blocks = document.querySelectorAll<HTMLElement>("[data-reveal], [data-inview]");
+    const blocks = document.querySelectorAll<HTMLElement>("[data-reveal], [data-scan], [data-inview]");
     const reveal = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
